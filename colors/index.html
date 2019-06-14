@@ -11779,11 +11779,13 @@ div#notebook {
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h3 id="An-Ergonomic-Color-Scheme-For-Code">An Ergonomic Color Scheme For Code<a class="anchor-link" href="#An-Ergonomic-Color-Scheme-For-Code">&#182;</a></h3><p>Source code is often displayed in colors to make it easier to read. Popular editors offer a wide variety of community-made color schemes. Since these colors have a practical function, there should be principles guiding them beyond personal preference. In this essay, I outline a set of principles, express them as optimization constraints and goals, and compute a feasible collection of colors.</p>
-<p>The first concern is the legibility of the text. General legibility is improved with maximum luminant contrast ratio against the background. WCAG guidelines (see <a href="https://www.w3.org/TR/WCAG/#contrast-enhanced">https://www.w3.org/TR/WCAG/#contrast-enhanced</a>) recommend a contrast ratio of at least 7, but more is better.</p>
-<p>With a black background, our foreground should be at least as bright as #959595: <a href="https://contrast-ratio.com/#%23959595-on-black">https://contrast-ratio.com/#%23959595-on-black</a></p>
-<p>With a white background, our foreground should be at least as dark as #595959: <a href="https://contrast-ratio.com/#%23595959-on-white">https://contrast-ratio.com/#%23595959-on-white</a></p>
-<p>The next concern is aligning the editor with my desired Attention Hierarchy (see <a href="https://colorusage.arc.nasa.gov/Percept_layers_1.php">https://colorusage.arc.nasa.gov/Percept_layers_1.php</a>). The cursor is a fair indication of my intended focus, so if the editor can highlight the current line, current expression, or all instances of the current symbol, those are helpful. Otherwise, the editor should not be distracting. The code should be a <strong>single perceptual layer</strong> - all colors should have equal brightness.</p>
-<p>After attention management, the next concern is parsing effort. Expressions are often bounded by paired delimiters. When these delimiters are nested, I must consciously scan the text to match them properly. To reduce this effort, we can draw delimiters with <strong>saturated colors</strong>, alternating hues by nesting level. This causes the desired pair to pop when searched for (see <a href="https://colorusage.arc.nasa.gov/popout.php">https://colorusage.arc.nasa.gov/popout.php</a>) without much interference to the attention hierarchy otherwise.</p>
+<p>The concerns that the color scheme can influence are eye strain, attention management, and parsing effort.</p>
+<p>The causes of eye strain that can be affected by color schemes are the contrast ratio of the text and the overall brightness of the screen. See <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3592304/">https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3592304/</a></p>
+<blockquote><p>"The brightness has to be adjusted so that it is about the same as the surroundings and the contrast has to be adjusted to as high as possible to eliminate the discomfort."</p>
+</blockquote>
+<p>I will provide two color schemes. One light-on-dark for work in bright environments, and one dark-on-light for work in dark environments.</p>
+<p>Next, the editor should align with my desired Attention Hierarchy (see <a href="https://colorusage.arc.nasa.gov/Percept_layers_1.php">https://colorusage.arc.nasa.gov/Percept_layers_1.php</a>). If there is a particular symbol or expression that I am interested in, the editor should highlight it. Otherwise, the editor should not be distracting. The code should be a single perceptual layer - all colors should have <strong>equal brightness</strong>.</p>
+<p>Next is parsing effort. Expressions are often bounded by paired delimiters. When these delimiters are nested, I must consciously scan the text to match them properly. To reduce this effort, I can draw delimiters with <strong>saturated colors</strong>, alternating hues by nesting level. This causes the desired pair to "pop" when searched for (see <a href="https://colorusage.arc.nasa.gov/popout.php">https://colorusage.arc.nasa.gov/popout.php</a>) without much interference to the attention hierarchy otherwise.</p>
 <p>Depending on the syntax and style of the code, parsing may involve mentally separating adjacent tokens. Consider this expression:</p>
 
 <pre><code>math.abs(math.log(0.5) / 3)
@@ -11804,9 +11806,9 @@ div#notebook {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>I have enough constraints and desiderata now to start framing this as an optimization problem. I'll optimize over the sRGB colorspace, evaluating solution quality in a CIECAM02m1 perceptual model, modified slightly to account for the Helmholtz-Kohlrausch effect (<a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2659800/">https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2659800/</a>)</p>
-<p>I want three colors for delimiters that have high (and equal) brightness, high (and equal) colorfulness, and hue angles sufficiently different.</p>
-<p>Then I want three colors at the same brightness, with low colorfulness and equally spaced hues, plus a grey at the same brightness. These will be used for variables, functions, language keywords, and primitives.</p>
+<p>I have enough constraints and desiderata now to start framing this as an optimization problem. I'll optimize over the sRGB colorspace, evaluating solution quality in a CIECAM02 perceptual model, with a crude modification to account for the Helmholtz-Kohlrausch effect (<a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2659800/">https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2659800/</a>)</p>
+<p>For the dark theme, I want three colors for delimiters that have high (and equal) brightness, high (and equal) colorfulness, and hue angles sufficiently different.</p>
+<p>Then I want four colors at the same brightness, with low colorfulness and equally spaced hues. These will be used for variables, functions, language keywords, and primitives.</p>
 
 </div>
 </div>
@@ -11819,43 +11821,60 @@ div#notebook {
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># First, conversion utilities between the domain and evaluation spaces</span>
 <span class="kn">from</span> <span class="nn">colormath.color_objects</span> <span class="k">import</span> <span class="n">sRGBColor</span><span class="p">,</span> <span class="n">LCHabColor</span><span class="p">,</span> <span class="n">LabColor</span><span class="p">,</span> <span class="n">XYZColor</span><span class="p">,</span> <span class="n">SpectralColor</span>
 <span class="kn">from</span> <span class="nn">colormath.color_conversions</span> <span class="k">import</span> <span class="n">convert_color</span>
-<span class="kn">from</span> <span class="nn">colormath.color_appearance_models</span> <span class="k">import</span> <span class="n">CIECAM02m1</span>
-<span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">from</span> <span class="nn">colormath.color_appearance_models</span> <span class="k">import</span> <span class="n">CIECAM02</span>
 <span class="kn">from</span> <span class="nn">scipy</span> <span class="k">import</span> <span class="n">optimize</span>
+<span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">import</span> <span class="nn">math</span>
 
 <span class="k">def</span> <span class="nf">hue_diff</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">):</span>
     <span class="n">in_one_direction</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">right</span> <span class="o">-</span> <span class="n">left</span><span class="p">)</span>
     <span class="n">in_the_other</span> <span class="o">=</span> <span class="mi">360</span> <span class="o">-</span> <span class="n">in_one_direction</span>
     <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="n">in_one_direction</span><span class="p">,</span> <span class="n">in_the_other</span><span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">hk_brightness_adjustment</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">h</span><span class="p">):</span>
-    <span class="n">cyanness</span> <span class="o">=</span> <span class="n">hue_diff</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="mi">180</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">cyanness</span> <span class="o">&lt;</span> <span class="mi">30</span><span class="p">:</span>
-        <span class="n">coefficient</span> <span class="o">=</span> <span class="mi">1</span>
-    <span class="k">elif</span> <span class="mi">30</span> <span class="o">&lt;</span> <span class="n">cyanness</span> <span class="o">&lt;</span> <span class="mi">60</span><span class="p">:</span>
-        <span class="n">coefficient</span> <span class="o">=</span> <span class="p">(</span><span class="mi">60</span> <span class="o">-</span> <span class="n">cyanness</span><span class="p">)</span> <span class="o">/</span> <span class="mi">30</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">coefficient</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="k">return</span> <span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">b</span> <span class="o">+</span> <span class="n">c</span> <span class="o">*</span> <span class="n">coefficient</span> <span class="o">*</span> <span class="mf">0.2</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
-    
+<span class="k">def</span> <span class="nf">hk_brightness</span><span class="p">(</span><span class="n">saturation</span><span class="p">,</span> <span class="n">hue</span><span class="p">,</span> <span class="n">lightness</span><span class="p">,</span> <span class="n">brightness</span><span class="p">):</span>
+    <span class="c1"># A very crude approximation of the chromatic strength from Nayatani:</span>
+    <span class="c1"># A Colorimetric Explanation of the Helmholtz-Kohlrausch Effect</span>
+    <span class="c1"># https://doi.org/10.1002/(SICI)1520-6378(199812)23:6%3C374::AID-COL5%3E3.0.CO;2-W</span>
+    <span class="n">blue_hue</span> <span class="o">=</span> <span class="o">-</span><span class="mi">93</span>
+    <span class="n">yellow_hue</span> <span class="o">=</span> <span class="mi">87</span>
+    <span class="n">max_coefficient</span> <span class="o">=</span> <span class="mf">0.35</span>
+    <span class="n">chromatic_strength</span> <span class="o">=</span> <span class="n">max_coefficient</span> <span class="o">*</span> <span class="n">hue_diff</span><span class="p">(</span><span class="n">hue</span><span class="p">,</span> <span class="n">yellow_hue</span><span class="p">)</span> <span class="o">/</span> <span class="mi">180</span>
+    <span class="n">multiplier</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">chromatic_strength</span> <span class="o">*</span> <span class="p">(</span><span class="n">lightness</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">saturation</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+    <span class="c1">#print(multiplier)</span>
+    <span class="k">return</span> <span class="n">multiplier</span> <span class="o">*</span> <span class="n">brightness</span>
+   
 <span class="n">EPSILON</span> <span class="o">=</span> <span class="mf">0.001</span>
-<span class="n">REF_WHITE</span> <span class="o">=</span> <span class="n">convert_color</span><span class="p">(</span><span class="n">sRGBColor</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="n">XYZColor</span><span class="p">)</span>
-<span class="n">BLACK_BACKGROUND</span> <span class="o">=</span> <span class="n">convert_color</span><span class="p">(</span><span class="n">sRGBColor</span><span class="p">(</span><span class="n">EPSILON</span><span class="p">,</span> <span class="n">EPSILON</span><span class="p">,</span> <span class="n">EPSILON</span><span class="p">),</span> <span class="n">XYZColor</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">rgb_row_to_cbh</span><span class="p">(</span><span class="n">rgb</span><span class="p">):</span>
-    <span class="n">xyz</span> <span class="o">=</span> <span class="n">convert_color</span><span class="p">(</span><span class="n">sRGBColor</span><span class="p">(</span><span class="n">rgb</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">rgb</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">rgb</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span> <span class="n">XYZColor</span><span class="p">)</span>
-    <span class="n">cbh</span> <span class="o">=</span> <span class="n">CIECAM02m1</span><span class="p">(</span>
-        <span class="n">xyz</span><span class="o">.</span><span class="n">xyz_x</span><span class="p">,</span> <span class="n">xyz</span><span class="o">.</span><span class="n">xyz_y</span><span class="p">,</span> <span class="n">xyz</span><span class="o">.</span><span class="n">xyz_z</span><span class="p">,</span>
-        <span class="n">REF_WHITE</span><span class="o">.</span><span class="n">xyz_x</span><span class="p">,</span> <span class="n">REF_WHITE</span><span class="o">.</span><span class="n">xyz_y</span><span class="p">,</span> <span class="n">REF_WHITE</span><span class="o">.</span><span class="n">xyz_z</span><span class="p">,</span>
-        <span class="n">BLACK_BACKGROUND</span><span class="o">.</span><span class="n">xyz_x</span><span class="p">,</span> <span class="n">BLACK_BACKGROUND</span><span class="o">.</span><span class="n">xyz_y</span><span class="p">,</span> <span class="n">BLACK_BACKGROUND</span><span class="o">.</span><span class="n">xyz_z</span><span class="p">,</span>
-        <span class="n">l_a</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="c1"># https://www.handprint.com/HP/WCL/color4.html#sensitivity - want office lighting</span>
-        <span class="n">c</span><span class="o">=</span><span class="mf">0.69</span><span class="p">,</span>
-        <span class="n">n_c</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-        <span class="n">f</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-        <span class="n">p</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">hk_brightness_adjustment</span><span class="p">(</span><span class="n">cbh</span><span class="o">.</span><span class="n">colorfulness</span><span class="p">,</span> <span class="n">cbh</span><span class="o">.</span><span class="n">brightness</span><span class="p">,</span> <span class="n">cbh</span><span class="o">.</span><span class="n">hue_angle</span><span class="p">)</span>
+<span class="n">WHITE</span> <span class="o">=</span> <span class="n">sRGBColor</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">WHITE_XYZ</span> <span class="o">=</span> <span class="n">convert_color</span><span class="p">(</span><span class="n">WHITE</span><span class="p">,</span> <span class="n">XYZColor</span><span class="p">)</span>
+<span class="n">BLACK</span> <span class="o">=</span> <span class="n">sRGBColor</span><span class="p">(</span><span class="n">EPSILON</span><span class="p">,</span> <span class="n">EPSILON</span><span class="p">,</span> <span class="n">EPSILON</span><span class="p">)</span>
+<span class="n">BLACK_XYZ</span> <span class="o">=</span> <span class="n">convert_color</span><span class="p">(</span><span class="n">BLACK</span><span class="p">,</span> <span class="n">XYZColor</span><span class="p">)</span>
+<span class="n">BRIGHT_OFFICE</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;ciecam_params&#39;</span><span class="p">:{</span>
+        <span class="s1">&#39;l_a&#39;</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span> 
+        <span class="s1">&#39;y_b&#39;</span><span class="p">:</span> <span class="n">WHITE_XYZ</span><span class="o">.</span><span class="n">xyz_y</span><span class="p">},</span> 
+    <span class="s1">&#39;background&#39;</span><span class="p">:</span> <span class="n">WHITE</span><span class="p">,</span>
+    <span class="s1">&#39;target_brightness&#39;</span><span class="p">:</span> <span class="mi">80</span>
+<span class="p">}</span>
+<span class="n">DIM_OFFICE</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;ciecam_params&#39;</span><span class="p">:{</span>
+        <span class="s1">&#39;l_a&#39;</span><span class="p">:</span><span class="mi">30</span><span class="p">,</span> 
+        <span class="s1">&#39;y_b&#39;</span><span class="p">:</span> <span class="n">BLACK_XYZ</span><span class="o">.</span><span class="n">xyz_y</span><span class="p">},</span> 
+    <span class="s1">&#39;background&#39;</span><span class="p">:</span> <span class="n">BLACK</span><span class="p">,</span>
+    <span class="s1">&#39;target_brightness&#39;</span><span class="p">:</span> <span class="mi">740</span>
+<span class="p">}</span>
 
-<span class="k">def</span> <span class="nf">rgb_array_to_cbh</span><span class="p">(</span><span class="n">arr</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">apply_along_axis</span><span class="p">(</span><span class="n">rgb_row_to_cbh</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">arr</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">rgb_row_to_cbh</span><span class="p">(</span><span class="n">rgb</span><span class="p">,</span> <span class="n">office</span><span class="p">):</span>
+    <span class="n">xyz</span> <span class="o">=</span> <span class="n">convert_color</span><span class="p">(</span><span class="n">sRGBColor</span><span class="p">(</span><span class="o">*</span><span class="n">rgb</span><span class="p">),</span> <span class="n">XYZColor</span><span class="p">)</span>
+    <span class="n">cbh</span> <span class="o">=</span> <span class="n">CIECAM02</span><span class="p">(</span>
+        <span class="n">xyz</span><span class="o">.</span><span class="n">xyz_x</span><span class="p">,</span> <span class="n">xyz</span><span class="o">.</span><span class="n">xyz_y</span><span class="p">,</span> <span class="n">xyz</span><span class="o">.</span><span class="n">xyz_z</span><span class="p">,</span>
+        <span class="n">WHITE_XYZ</span><span class="o">.</span><span class="n">xyz_x</span><span class="p">,</span> <span class="n">WHITE_XYZ</span><span class="o">.</span><span class="n">xyz_y</span><span class="p">,</span> <span class="n">WHITE_XYZ</span><span class="o">.</span><span class="n">xyz_z</span><span class="p">,</span>
+        <span class="n">c</span><span class="o">=</span><span class="mf">0.69</span><span class="p">,</span> <span class="n">n_c</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">office</span><span class="p">[</span><span class="s1">&#39;ciecam_params&#39;</span><span class="p">])</span>
+    <span class="n">hkb</span> <span class="o">=</span> <span class="n">hk_brightness</span><span class="p">(</span><span class="n">cbh</span><span class="o">.</span><span class="n">saturation</span><span class="p">,</span> <span class="n">cbh</span><span class="o">.</span><span class="n">hue_angle</span><span class="p">,</span> <span class="n">cbh</span><span class="o">.</span><span class="n">lightness</span><span class="p">,</span> <span class="n">cbh</span><span class="o">.</span><span class="n">brightness</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">cbh</span><span class="o">.</span><span class="n">colorfulness</span><span class="p">,</span> <span class="n">hkb</span><span class="p">,</span> <span class="n">cbh</span><span class="o">.</span><span class="n">hue_angle</span>
+
+<span class="k">def</span> <span class="nf">rgb_array_to_cbh</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">office</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">apply_along_axis</span><span class="p">(</span><span class="n">rgb_row_to_cbh</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">arr</span><span class="p">,</span> <span class="n">office</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -11870,22 +11889,35 @@ div#notebook {
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Some helper functions to look at the results</span>
 <span class="kn">from</span> <span class="nn">IPython.display</span> <span class="k">import</span> <span class="n">HTML</span>
+
 <span class="k">def</span> <span class="nf">rgb_row_to_lch</span><span class="p">(</span><span class="n">rgb</span><span class="p">):</span>
     <span class="n">lchab</span> <span class="o">=</span> <span class="n">convert_color</span><span class="p">(</span><span class="n">sRGBColor</span><span class="p">(</span><span class="o">*</span><span class="n">rgb</span><span class="p">),</span> <span class="n">LCHabColor</span><span class="p">)</span>
     <span class="k">return</span> <span class="p">(</span><span class="n">lchab</span><span class="o">.</span><span class="n">lch_c</span><span class="p">,</span> <span class="n">lchab</span><span class="o">.</span><span class="n">lch_l</span><span class="p">,</span> <span class="n">lchab</span><span class="o">.</span><span class="n">lch_h</span><span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">hexcode_demo</span><span class="p">(</span><span class="n">c</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">f</span><span class="s1">&#39;&#39;&#39;&lt;text style=&#39;font-weight: bold; font-family: monospaced; color: </span><span class="si">{c}</span><span class="s1">; background-color: #000000&#39;&gt;</span><span class="si">{c}</span><span class="s1">&lt;/text&gt;&#39;&#39;&#39;</span>
+<span class="k">def</span> <span class="nf">hexcode_demo</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">f</span><span class="s1">&#39;&#39;&#39;&lt;text style=&#39;font-weight: bold; font-family: monospaced; color: </span><span class="si">{f}</span><span class="s1">; background-color: </span><span class="si">{b}</span><span class="s1">&#39;&gt;</span><span class="si">{f}</span><span class="s1">&lt;/text&gt;&#39;&#39;&#39;</span>
 
-<span class="k">def</span> <span class="nf">rgb_row_to_html</span><span class="p">(</span><span class="n">rgb</span><span class="p">):</span>
-    <span class="n">hexcode</span> <span class="o">=</span> <span class="n">sRGBColor</span><span class="p">(</span><span class="o">*</span><span class="n">rgb</span><span class="p">)</span><span class="o">.</span><span class="n">get_rgb_hex</span><span class="p">()</span>
-    <span class="k">return</span> <span class="n">hexcode_demo</span><span class="p">(</span><span class="n">hexcode</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">rgb_row_to_html</span><span class="p">(</span><span class="n">rgb</span><span class="p">,</span> <span class="n">office</span><span class="p">):</span>
+    <span class="n">foreground</span> <span class="o">=</span> <span class="n">sRGBColor</span><span class="p">(</span><span class="o">*</span><span class="n">rgb</span><span class="p">)</span><span class="o">.</span><span class="n">get_rgb_hex</span><span class="p">()</span>
+    <span class="n">background</span> <span class="o">=</span> <span class="n">office</span><span class="p">[</span><span class="s1">&#39;background&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get_rgb_hex</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">hexcode_demo</span><span class="p">(</span><span class="n">foreground</span><span class="p">,</span> <span class="n">background</span><span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">show</span><span class="p">(</span><span class="n">results_dot_x</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">row_to_str</span><span class="p">(</span><span class="n">row</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;</span><span class="si">{0:.1f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">p</span><span class="p">)</span><span class="o">.</span><span class="n">rjust</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">row</span><span class="p">])</span>
+
+<span class="k">def</span> <span class="nf">array_to_str</span><span class="p">(</span><span class="n">arr</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">row_to_str</span><span class="p">,</span> <span class="n">arr</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">show</span><span class="p">(</span><span class="n">results_dot_x</span><span class="p">,</span> <span class="n">office</span><span class="p">):</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">results_dot_x</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">results_dot_x</span><span class="o">.</span><span class="n">size</span><span class="o">//</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;CIECAM colorfulness, brightness, hue:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">rgb_array_to_cbh</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;LCHab chroma, luminance, hue:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">apply_along_axis</span><span class="p">(</span><span class="n">rgb_row_to_lch</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">x</span><span class="p">))</span>
-    <span class="n">htmls</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="n">rgb_row_to_html</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+    <span class="n">model_params</span> <span class="o">=</span> <span class="n">array_to_str</span><span class="p">(</span><span class="n">rgb_array_to_cbh</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">office</span><span class="p">))</span>
+    
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Model colorfulness, brightness, hue:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">model_params</span><span class="p">)</span>
+    <span class="n">lch_params</span> <span class="o">=</span> <span class="n">array_to_str</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">apply_along_axis</span><span class="p">(</span><span class="n">rgb_row_to_lch</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">x</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;LCHab chroma, luminance, hue:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">lch_params</span><span class="p">)</span>
+    <span class="n">htmls</span> <span class="o">=</span> <span class="p">[</span><span class="n">rgb_row_to_html</span><span class="p">(</span><span class="n">rgb</span><span class="p">,</span> <span class="n">office</span><span class="p">)</span> <span class="k">for</span> <span class="n">rgb</span> <span class="ow">in</span> <span class="n">x</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">HTML</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">htmls</span><span class="p">))</span>
 </pre></div>
 
@@ -11899,35 +11931,22 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[3]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Next, the score function for a delimiter color solution</span>
-<span class="n">BRIGHTNESS_TARGET</span> <span class="o">=</span> <span class="mi">1000</span>
-<span class="k">def</span> <span class="nf">brightness_penalty</span><span class="p">(</span><span class="n">cbh_colors</span><span class="p">):</span>
-    <span class="k">return</span> <span class="nb">sum</span><span class="p">([(</span><span class="n">cbh</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">BRIGHTNESS_TARGET</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="k">for</span> <span class="n">cbh</span> <span class="ow">in</span> <span class="n">cbh_colors</span><span class="p">])</span>
-
-<span class="k">def</span> <span class="nf">colorfulness_score</span><span class="p">(</span><span class="n">cbh_colors</span><span class="p">):</span>
-    <span class="n">min_colorfulness</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">cbh</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">cbh</span> <span class="ow">in</span> <span class="n">cbh_colors</span><span class="p">)</span>
-    <span class="n">range_colorfulness</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">cbh</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">cbh</span> <span class="ow">in</span> <span class="n">cbh_colors</span><span class="p">)</span> <span class="o">-</span> <span class="n">min_colorfulness</span>
-    <span class="k">return</span> <span class="n">min_colorfulness</span> <span class="o">-</span> <span class="n">range_colorfulness</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="mi">100</span>
-
-<span class="n">hue_diff_min_target</span> <span class="o">=</span> <span class="mi">80</span>
-<span class="k">def</span> <span class="nf">hue_overlap_penalty</span><span class="p">(</span><span class="n">cbh_colors</span><span class="p">):</span>
-    <span class="n">hues</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">cbh</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="k">for</span> <span class="n">cbh</span> <span class="ow">in</span> <span class="n">cbh_colors</span><span class="p">)</span>
-    <span class="n">hue_diffs</span> <span class="o">=</span> <span class="p">[</span><span class="n">hue_diff</span><span class="p">(</span><span class="n">hues</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">hues</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">hues</span><span class="p">))]</span>
-    <span class="n">hue_diff_min_actual</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">hue_diffs</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">hue_diff_min_actual</span> <span class="o">&gt;</span> <span class="n">hue_diff_min_target</span><span class="p">:</span>
-        <span class="c1"># beating the target minimum is worth a small bonus</span>
-        <span class="k">return</span> <span class="o">-</span><span class="p">((</span><span class="n">hue_diff_min_actual</span> <span class="o">-</span> <span class="n">hue_diff_min_target</span><span class="p">)</span><span class="o">**</span><span class="mf">0.5</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">hue_diff_min_target</span> <span class="o">-</span> <span class="n">hue_diff_min_actual</span>
-
-<span class="k">def</span> <span class="nf">cbh_delimiter_penalty</span><span class="p">(</span><span class="n">cbh_colors</span><span class="p">):</span>
-    <span class="k">return</span> <span class="o">-</span><span class="n">colorfulness_score</span><span class="p">(</span><span class="n">cbh_colors</span><span class="p">)</span> \
-            <span class="o">+</span> <span class="n">brightness_penalty</span><span class="p">(</span><span class="n">cbh_colors</span><span class="p">)</span> <span class="o">/</span> <span class="mi">5</span> \
-            <span class="o">+</span> <span class="n">hue_overlap_penalty</span><span class="p">(</span><span class="n">cbh_colors</span><span class="p">)</span> <span class="o">*</span> <span class="mi">20</span>
-
-<span class="k">def</span> <span class="nf">rgb_delimiter_penalty</span><span class="p">(</span><span class="n">rgb_colors</span><span class="p">):</span>
-    <span class="n">shaped_rgb</span> <span class="o">=</span> <span class="n">rgb_colors</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">rgb_colors</span><span class="o">.</span><span class="n">size</span><span class="o">//</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
-    <span class="k">return</span> <span class="n">cbh_delimiter_penalty</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">rgb_array_to_cbh</span><span class="p">(</span><span class="n">shaped_rgb</span><span class="p">)))</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    The constraints of the sRGB color gamut at high brightness </span>
+<span class="sd">    restrict the palette of saturated colors to yellow -&gt; green -&gt; cyan.</span>
+<span class="sd">    Play with http://www.hsluv.org/ to understand why this is the case/</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="n">INITIAL_GUESS_DARK</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span>
+    <span class="c1"># Three saturated colors for delimiters</span>
+           <span class="mi">1</span><span class="p">,</span>   <span class="o">.</span><span class="mi">9</span><span class="p">,</span>    <span class="mi">0</span><span class="p">,</span> 
+           <span class="mi">0</span><span class="p">,</span>    <span class="mi">1</span><span class="p">,</span>    <span class="mi">1</span><span class="p">,</span>
+           <span class="mi">0</span><span class="p">,</span>  <span class="mf">0.5</span><span class="p">,</span>    <span class="mi">1</span><span class="p">,</span>
+    <span class="c1"># Four pastels for symbols</span>
+           <span class="mi">1</span><span class="p">,</span>    <span class="mi">1</span><span class="p">,</span>  <span class="mf">0.8</span><span class="p">,</span>
+         <span class="mf">0.8</span><span class="p">,</span>    <span class="mi">1</span><span class="p">,</span>    <span class="mi">1</span><span class="p">,</span> 
+           <span class="mi">1</span><span class="p">,</span>  <span class="mf">0.8</span><span class="p">,</span>    <span class="mi">1</span><span class="p">,</span>
+         <span class="mf">0.8</span><span class="p">,</span>    <span class="mi">1</span><span class="p">,</span>  <span class="mf">0.8</span><span class="p">]</span>
+<span class="p">])</span>
 </pre></div>
 
 </div>
@@ -11940,20 +11959,36 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[4]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    The constraints of the sRGB color gamut at this brightness </span>
-<span class="sd">    restrict the palette of saturated colors to yellow -&gt; green -&gt; cyan.</span>
-<span class="sd">    Play with http://www.hsluv.org/ to understand why this is the case/</span>
-<span class="sd">&#39;&#39;&#39;</span>
-<span class="n">init</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span>   <span class="mi">1</span><span class="p">,</span>  <span class="o">.</span><span class="mi">8</span><span class="p">,</span> <span class="n">EPSILON</span><span class="p">,</span>
-                     <span class="n">EPSILON</span><span class="p">,</span>   <span class="mi">1</span><span class="p">,</span> <span class="n">EPSILON</span><span class="p">,</span> 
-                     <span class="n">EPSILON</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">,</span>    <span class="mi">1</span><span class="p">]])</span>
-<span class="n">delimiters</span> <span class="o">=</span> <span class="n">optimize</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span>
-        <span class="n">rgb_delimiter_penalty</span><span class="p">,</span> 
-        <span class="n">init</span><span class="p">,</span>
-        <span class="n">method</span><span class="o">=</span><span class="s2">&quot;L-BFGS-B&quot;</span><span class="p">,</span> 
-        <span class="n">bounds</span><span class="o">=</span><span class="p">[(</span><span class="n">EPSILON</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span> <span class="o">*</span> <span class="n">init</span><span class="o">.</span><span class="n">size</span>
-<span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">brightness_penalty</span><span class="p">(</span><span class="n">cbh_colors</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">sum</span><span class="p">([(</span><span class="n">cbh</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">target</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="k">for</span> <span class="n">cbh</span> <span class="ow">in</span> <span class="n">cbh_colors</span><span class="p">])</span> <span class="o">/</span> <span class="mi">5</span>
+
+<span class="k">def</span> <span class="nf">colorfulness_score</span><span class="p">(</span><span class="n">cbh_colors</span><span class="p">):</span>
+    <span class="n">delimiter_min_colorfulness</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">cbh_colors</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+    <span class="n">delimiter_range_colorfulness</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">cbh_colors</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span> <span class="o">-</span> <span class="n">delimiter_min_colorfulness</span>
+    
+    <span class="n">symbol_colorfulness_target</span> <span class="o">=</span> <span class="n">delimiter_min_colorfulness</span> <span class="o">/</span> <span class="mi">2</span>
+    <span class="n">symbol_penalty</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([(</span><span class="n">cbh_colors</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">symbol_colorfulness_target</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">7</span><span class="p">)])</span>
+    
+    <span class="k">return</span> <span class="n">delimiter_min_colorfulness</span> <span class="o">-</span> <span class="n">delimiter_range_colorfulness</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="mi">100</span> <span class="o">-</span> <span class="n">symbol_penalty</span>
+
+
+<span class="k">def</span> <span class="nf">hue_overlap_penalty</span><span class="p">(</span><span class="n">cbh_colors</span><span class="p">):</span>
+    <span class="n">hues</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">cbh</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="k">for</span> <span class="n">cbh</span> <span class="ow">in</span> <span class="n">cbh_colors</span><span class="p">)</span>
+    <span class="n">hue_diffs</span> <span class="o">=</span> <span class="p">[</span><span class="n">hue_diff</span><span class="p">(</span><span class="n">hues</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">hues</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">hues</span><span class="p">))]</span>
+    <span class="k">return</span> <span class="nb">sum</span><span class="p">([</span><span class="mi">5000</span><span class="o">/</span><span class="p">(</span><span class="n">hd</span><span class="o">+</span><span class="mi">5</span><span class="p">)</span> <span class="k">for</span> <span class="n">hd</span> <span class="ow">in</span> <span class="n">hue_diffs</span><span class="p">])</span>
+
+
+<span class="k">def</span> <span class="nf">cbh_penalty</span><span class="p">(</span><span class="n">cbh_colors</span><span class="p">,</span> <span class="n">target_brightness</span><span class="p">):</span>
+    <span class="n">delimiters</span> <span class="o">=</span> <span class="n">cbh_colors</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span>
+    <span class="n">symbols</span> <span class="o">=</span> <span class="n">cbh_colors</span><span class="p">[</span><span class="mi">3</span><span class="p">:]</span>
+    <span class="k">return</span> <span class="o">-</span><span class="n">colorfulness_score</span><span class="p">(</span><span class="n">cbh_colors</span><span class="p">)</span> \
+            <span class="o">+</span> <span class="n">brightness_penalty</span><span class="p">(</span><span class="n">cbh_colors</span><span class="p">,</span> <span class="n">target_brightness</span><span class="p">)</span> \
+            <span class="o">+</span> <span class="n">hue_overlap_penalty</span><span class="p">(</span><span class="n">delimiters</span><span class="p">)</span> \
+            <span class="o">+</span> <span class="n">hue_overlap_penalty</span><span class="p">(</span><span class="n">symbols</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">rgb_delimiter_penalty</span><span class="p">(</span><span class="n">rgb_colors</span><span class="p">,</span> <span class="n">office</span><span class="p">):</span>
+    <span class="n">shaped_rgb</span> <span class="o">=</span> <span class="n">rgb_colors</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">rgb_colors</span><span class="o">.</span><span class="n">size</span><span class="o">//</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">cbh_penalty</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">rgb_array_to_cbh</span><span class="p">(</span><span class="n">shaped_rgb</span><span class="p">,</span> <span class="n">office</span><span class="p">)),</span> <span class="n">office</span><span class="p">[</span><span class="s1">&#39;target_brightness&#39;</span><span class="p">])</span>
 </pre></div>
 
 </div>
@@ -11966,7 +12001,7 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[5]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">show</span><span class="p">(</span><span class="n">delimiters</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">show</span><span class="p">(</span><span class="n">INITIAL_GUESS_DARK</span><span class="p">,</span> <span class="n">DIM_OFFICE</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -11981,14 +12016,22 @@ div#notebook {
 <div class="prompt"></div>
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>CIECAM colorfulness, brightness, hue:
- [[ 182.64027938  994.52258182   96.85470527]
- [ 233.87803738  998.94501506  150.02120087]
- [ 182.64233942  990.60573293 -156.81230349]]
+<pre>Model colorfulness, brightness, hue:
+   213.5,    741.0,     97.6
+   166.2,    758.6,   -162.4
+   235.3,    594.3,   -107.8
+    60.0,    773.3,    101.8
+    65.6,    771.9,   -161.6
+    89.8,    746.2,    -34.6
+    83.0,    761.8,    142.2
 LCHab chroma, luminance, hue:
- [[  70.93356309   92.24384151   97.54484368]
- [  84.82709791   87.75045124  151.12061517]
- [  47.25896175   88.0126914   203.43691756]]
+    90.2,     90.6,     95.8
+    50.1,     91.1,    196.4
+    73.7,     54.6,    285.0
+    25.7,     98.9,    108.2
+    16.9,     96.6,    198.4
+    32.0,     87.8,    325.5
+    32.0,     95.5,    143.1
 </pre>
 </div>
 </div>
@@ -11998,7 +12041,7 @@ LCHab chroma, luminance, hue:
 
 
 <div class="output_html rendered_html output_subarea output_execute_result">
-<text style='font-weight: bold; font-family: monospaced; color: #ffeb59; background-color: #000000'>#ffeb59</text><text style='font-weight: bold; font-family: monospaced; color: #00fc8a; background-color: #000000'>#00fc8a</text><text style='font-weight: bold; font-family: monospaced; color: #02f4ff; background-color: #000000'>#02f4ff</text>
+<text style='font-weight: bold; font-family: monospaced; color: #ffe600; background-color: #000000'>#ffe600</text><text style='font-weight: bold; font-family: monospaced; color: #00ffff; background-color: #000000'>#00ffff</text><text style='font-weight: bold; font-family: monospaced; color: #0080ff; background-color: #000000'>#0080ff</text><text style='font-weight: bold; font-family: monospaced; color: #ffffcc; background-color: #000000'>#ffffcc</text><text style='font-weight: bold; font-family: monospaced; color: #ccffff; background-color: #000000'>#ccffff</text><text style='font-weight: bold; font-family: monospaced; color: #ffccff; background-color: #000000'>#ffccff</text><text style='font-weight: bold; font-family: monospaced; color: #ccffcc; background-color: #000000'>#ccffcc</text>
 </div>
 
 </div>
@@ -12012,32 +12055,13 @@ LCHab chroma, luminance, hue:
 <div class="prompt input_prompt">In&nbsp;[6]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">brightness_penalty</span><span class="p">(</span><span class="n">cbh_colors</span><span class="p">):</span>
-    <span class="k">return</span> <span class="nb">sum</span><span class="p">([(</span><span class="n">cbh</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">BRIGHTNESS_TARGET</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="k">for</span> <span class="n">cbh</span> <span class="ow">in</span> <span class="n">cbh_colors</span><span class="p">])</span>
-
-<span class="n">SYMBOL_COLORFULNESS_TARGET</span> <span class="o">=</span> <span class="mi">65</span>
-<span class="k">def</span> <span class="nf">colorfulness_penalty</span><span class="p">(</span><span class="n">cbh_colors</span><span class="p">):</span>
-    <span class="k">return</span> <span class="nb">sum</span><span class="p">([(</span><span class="n">cbh</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">SYMBOL_COLORFULNESS_TARGET</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="k">for</span> <span class="n">cbh</span> <span class="ow">in</span> <span class="n">cbh_colors</span><span class="p">])</span>
-
-<span class="n">hue_diff_min_target</span> <span class="o">=</span> <span class="mi">80</span>
-<span class="k">def</span> <span class="nf">hue_overlap_penalty</span><span class="p">(</span><span class="n">cbh_colors</span><span class="p">):</span>
-    <span class="n">hues</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">cbh</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="k">for</span> <span class="n">cbh</span> <span class="ow">in</span> <span class="n">cbh_colors</span><span class="p">)</span>
-    <span class="n">hue_diffs</span> <span class="o">=</span> <span class="p">[</span><span class="n">hue_diff</span><span class="p">(</span><span class="n">hues</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">hues</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">hues</span><span class="p">))]</span>
-    <span class="n">hue_diff_min_actual</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">hue_diffs</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">hue_diff_min_actual</span> <span class="o">&gt;</span> <span class="n">hue_diff_min_target</span><span class="p">:</span>
-        <span class="c1"># beating the target minimum is worth a small bonus</span>
-        <span class="k">return</span> <span class="o">-</span><span class="p">((</span><span class="n">hue_diff_min_actual</span> <span class="o">-</span> <span class="n">hue_diff_min_target</span><span class="p">)</span><span class="o">**</span><span class="mf">0.5</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">hue_diff_min_target</span> <span class="o">-</span> <span class="n">hue_diff_min_actual</span>
-
-<span class="k">def</span> <span class="nf">cbh_symbol_penalty</span><span class="p">(</span><span class="n">cbh_colors</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">brightness_penalty</span><span class="p">(</span><span class="n">cbh_colors</span><span class="p">)</span> \
-            <span class="o">+</span> <span class="n">colorfulness_penalty</span><span class="p">(</span><span class="n">cbh_colors</span><span class="p">)</span> \
-            <span class="o">+</span> <span class="n">hue_overlap_penalty</span><span class="p">(</span><span class="n">cbh_colors</span><span class="p">)</span> <span class="o">*</span> <span class="mi">10</span>
-
-<span class="k">def</span> <span class="nf">rgb_symbol_penalty</span><span class="p">(</span><span class="n">rgb_colors</span><span class="p">):</span>
-    <span class="n">shaped_rgb</span> <span class="o">=</span> <span class="n">rgb_colors</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">rgb_colors</span><span class="o">.</span><span class="n">size</span><span class="o">//</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
-    <span class="k">return</span> <span class="n">cbh_symbol_penalty</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">rgb_array_to_cbh</span><span class="p">(</span><span class="n">shaped_rgb</span><span class="p">)))</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">dim_solution</span> <span class="o">=</span> <span class="n">optimize</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span>
+    <span class="n">rgb_delimiter_penalty</span><span class="p">,</span> 
+    <span class="n">INITIAL_GUESS_DARK</span><span class="p">,</span>
+    <span class="n">method</span><span class="o">=</span><span class="s2">&quot;L-BFGS-B&quot;</span><span class="p">,</span> 
+    <span class="n">bounds</span><span class="o">=</span><span class="p">[(</span><span class="n">EPSILON</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span> <span class="o">*</span> <span class="n">INITIAL_GUESS_DARK</span><span class="o">.</span><span class="n">size</span><span class="p">,</span>
+    <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">DIM_OFFICE</span><span class="p">,)</span>
+<span class="p">)</span>
 </pre></div>
 
 </div>
@@ -12050,28 +12074,7 @@ LCHab chroma, luminance, hue:
 <div class="prompt input_prompt">In&nbsp;[7]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">init</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.8</span><span class="p">,</span>   <span class="mi">1</span><span class="p">,</span>   <span class="mi">1</span><span class="p">,</span> 
-                       <span class="mi">1</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span>   <span class="mi">1</span><span class="p">,</span>
-                       <span class="mi">1</span><span class="p">,</span>   <span class="mi">1</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">]])</span>
-<span class="n">symbols</span> <span class="o">=</span> <span class="n">optimize</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span>
-    <span class="n">rgb_symbol_penalty</span><span class="p">,</span> 
-    <span class="n">init</span><span class="p">,</span>
-    <span class="n">method</span><span class="o">=</span><span class="s2">&quot;L-BFGS-B&quot;</span><span class="p">,</span> 
-    <span class="n">bounds</span><span class="o">=</span><span class="p">[(</span><span class="n">EPSILON</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span> <span class="o">*</span> <span class="n">init</span><span class="o">.</span><span class="n">size</span>
-<span class="p">)</span>
-</pre></div>
-
-</div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[8]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">show</span><span class="p">(</span><span class="n">symbols</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">show</span><span class="p">(</span><span class="n">dim_solution</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">DIM_OFFICE</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -12086,14 +12089,87 @@ LCHab chroma, luminance, hue:
 <div class="prompt"></div>
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>CIECAM colorfulness, brightness, hue:
- [[   64.99373097  1000.02463176  -155.22591263]
- [   63.03624511   997.16042339   -35.22593033]
- [   64.99594257   999.982637      84.7741025 ]]
+<pre>Model colorfulness, brightness, hue:
+   165.7,    738.8,     94.1
+   183.7,    739.8,    158.7
+   165.7,    737.3,   -153.2
+    82.7,    739.6,     81.1
+    82.6,    738.4,   -118.3
+    82.8,    740.0,    -26.4
+    82.9,    740.0,    162.9
 LCHab chroma, luminance, hue:
- [[  14.20133473   91.94770803  206.40330029]
- [  19.45469319   92.45689709  325.09496481]
- [  24.79104197   93.14041074   92.60964246]]
+    70.9,     90.4,     94.9
+    71.6,     88.9,    158.8
+    45.7,     86.1,    208.3
+    35.1,     90.7,     87.5
+    20.4,     87.0,    256.0
+    28.9,     87.0,    332.1
+    28.1,     90.1,    161.4
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+<div class="prompt output_prompt">Out[7]:</div>
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<text style='font-weight: bold; font-family: monospaced; color: #ffe454; background-color: #000000'>#ffe454</text><text style='font-weight: bold; font-family: monospaced; color: #28fdab; background-color: #000000'>#28fdab</text><text style='font-weight: bold; font-family: monospaced; color: #06eeff; background-color: #000000'>#06eeff</text><text style='font-weight: bold; font-family: monospaced; color: #ffe1a1; background-color: #000000'>#ffe1a1</text><text style='font-weight: bold; font-family: monospaced; color: #badeff; background-color: #000000'>#badeff</text><text style='font-weight: bold; font-family: monospaced; color: #ffcaf4; background-color: #000000'>#ffcaf4</text><text style='font-weight: bold; font-family: monospaced; color: #b0f1d1; background-color: #000000'>#b0f1d1</text>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[8]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">INITIAL_GUESS_BRIGHT</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span>
+    <span class="c1"># Three saturated colors for delimiters</span>
+      <span class="o">.</span><span class="mi">8</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>   <span class="mi">0</span><span class="p">,</span> 
+      <span class="o">.</span><span class="mi">6</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="o">.</span><span class="mi">5</span><span class="p">,</span>
+       <span class="mi">0</span><span class="p">,</span> <span class="o">.</span><span class="mi">3</span><span class="p">,</span>   <span class="mi">1</span><span class="p">,</span>
+    <span class="c1"># Four pastels for symbols</span>
+      <span class="o">.</span><span class="mi">5</span><span class="p">,</span> <span class="o">.</span><span class="mi">4</span><span class="p">,</span>  <span class="o">.</span><span class="mi">5</span><span class="p">,</span>
+      <span class="o">.</span><span class="mi">4</span><span class="p">,</span> <span class="o">.</span><span class="mi">5</span><span class="p">,</span>  <span class="o">.</span><span class="mi">5</span><span class="p">,</span> 
+      <span class="o">.</span><span class="mi">5</span><span class="p">,</span> <span class="o">.</span><span class="mi">5</span><span class="p">,</span>  <span class="o">.</span><span class="mi">4</span><span class="p">,</span>
+      <span class="o">.</span><span class="mi">4</span><span class="p">,</span> <span class="o">.</span><span class="mi">5</span><span class="p">,</span>  <span class="o">.</span><span class="mi">4</span><span class="p">]</span>
+<span class="p">])</span>
+<span class="n">show</span><span class="p">(</span><span class="n">INITIAL_GUESS_BRIGHT</span><span class="p">,</span> <span class="n">BRIGHT_OFFICE</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+<div class="prompt"></div>
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Model colorfulness, brightness, hue:
+    83.2,     92.7,     32.2
+    57.5,     79.2,    -19.3
+    70.5,     85.2,   -101.9
+    16.6,     92.8,    -34.7
+    12.6,     98.8,   -161.5
+    11.5,    100.9,    101.7
+    15.7,     97.5,    142.2
+LCHab chroma, luminance, hue:
+    88.4,     42.5,     40.0
+    69.4,     34.6,    336.1
+   105.0,     41.9,    299.0
+    18.2,     46.4,    325.5
+     9.6,     51.5,    198.4
+    14.6,     52.7,    108.3
+    18.2,     50.8,    143.2
 </pre>
 </div>
 </div>
@@ -12103,7 +12179,7 @@ LCHab chroma, luminance, hue:
 
 
 <div class="output_html rendered_html output_subarea output_execute_result">
-<text style='font-weight: bold; font-family: monospaced; color: #c6f0f3; background-color: #000000'>#c6f0f3</text><text style='font-weight: bold; font-family: monospaced; color: #ffe0ff; background-color: #000000'>#ffe0ff</text><text style='font-weight: bold; font-family: monospaced; color: #fceabc; background-color: #000000'>#fceabc</text>
+<text style='font-weight: bold; font-family: monospaced; color: #cc0000; background-color: #ffffff'>#cc0000</text><text style='font-weight: bold; font-family: monospaced; color: #990080; background-color: #ffffff'>#990080</text><text style='font-weight: bold; font-family: monospaced; color: #004dff; background-color: #ffffff'>#004dff</text><text style='font-weight: bold; font-family: monospaced; color: #806680; background-color: #ffffff'>#806680</text><text style='font-weight: bold; font-family: monospaced; color: #668080; background-color: #ffffff'>#668080</text><text style='font-weight: bold; font-family: monospaced; color: #808066; background-color: #ffffff'>#808066</text><text style='font-weight: bold; font-family: monospaced; color: #668066; background-color: #ffffff'>#668066</text>
 </div>
 
 </div>
@@ -12117,8 +12193,26 @@ LCHab chroma, luminance, hue:
 <div class="prompt input_prompt">In&nbsp;[9]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># The grey at this brightness is:</span>
-<span class="n">HTML</span><span class="p">(</span><span class="n">hexcode_demo</span><span class="p">(</span><span class="s2">&quot;#e7e7e7&quot;</span><span class="p">))</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">bright_solution</span> <span class="o">=</span> <span class="n">optimize</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span>
+    <span class="n">rgb_delimiter_penalty</span><span class="p">,</span> 
+    <span class="n">INITIAL_GUESS_BRIGHT</span><span class="p">,</span>
+    <span class="n">method</span><span class="o">=</span><span class="s2">&quot;L-BFGS-B&quot;</span><span class="p">,</span> 
+    <span class="n">bounds</span><span class="o">=</span><span class="p">[(</span><span class="n">EPSILON</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span> <span class="o">*</span> <span class="n">INITIAL_GUESS_BRIGHT</span><span class="o">.</span><span class="n">size</span><span class="p">,</span>
+    <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">BRIGHT_OFFICE</span><span class="p">,)</span>
+<span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[10]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">show</span><span class="p">(</span><span class="n">bright_solution</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">BRIGHT_OFFICE</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -12130,33 +12224,39 @@ LCHab chroma, luminance, hue:
 
 
 <div class="output_area">
-<div class="prompt output_prompt">Out[9]:</div>
+<div class="prompt"></div>
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Model colorfulness, brightness, hue:
+    60.3,     81.3,     38.6
+    60.3,     82.4,    -39.3
+    65.6,     80.7,   -102.1
+    30.0,     79.9,    -26.2
+    30.3,     80.2,   -116.4
+    30.3,     79.6,     61.7
+    30.3,     80.1,    148.5
+LCHab chroma, luminance, hue:
+    69.2,     36.8,     45.6
+    88.2,     36.9,    322.5
+    95.6,     39.3,    298.1
+    35.7,     37.2,    331.5
+    26.9,     39.2,    264.1
+    39.7,     37.8,     66.0
+    37.6,     40.0,    149.3
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+<div class="prompt output_prompt">Out[10]:</div>
 
 
 <div class="output_html rendered_html output_subarea output_execute_result">
-<text style='font-weight: bold; font-family: monospaced; color: #e7e7e7; background-color: #000000'>#e7e7e7</text>
+<text style='font-weight: bold; font-family: monospaced; color: #a32900; background-color: #ffffff'>#a32900</text><text style='font-weight: bold; font-family: monospaced; color: #9500af; background-color: #ffffff'>#9500af</text><text style='font-weight: bold; font-family: monospaced; color: #004aea; background-color: #ffffff'>#004aea</text><text style='font-weight: bold; font-family: monospaced; color: #7c4473; background-color: #ffffff'>#7c4473</text><text style='font-weight: bold; font-family: monospaced; color: #326088; background-color: #ffffff'>#326088</text><text style='font-weight: bold; font-family: monospaced; color: #7f4e1d; background-color: #ffffff'>#7f4e1d</text><text style='font-weight: bold; font-family: monospaced; color: #286b3e; background-color: #ffffff'>#286b3e</text>
 </div>
 
 </div>
 
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># TODO: fix function/symbol name overlaps</span>
-<span class="c1"># fix HK adjustment. </span>
-<span class="c1"># short introduction and reading list for color perception models (show #00FF00 on #0000FF and #FF0000 on #0000FF)</span>
-<span class="c1"># short blurb about background lighting</span>
-<span class="c1"># show initial rgb guesses</span>
-<span class="c1"># re-run for white background</span>
-</pre></div>
-
-</div>
 </div>
 </div>
 
@@ -12172,6 +12272,33 @@ LCHab chroma, luminance, hue:
 
 </div>
 </div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="sd">&#39;&#39;&#39;Future work:</span>
+<span class="sd">Dim office:</span>
+<span class="sd">    delimiter green seems too close to delimiter blue</span>
+<span class="sd">        is this model perceptually uniform on hue?</span>
+<span class="sd">    delimiter yellow seems darker</span>
+<span class="sd">        increase HK effect max?</span>
+<span class="sd">    recreate screenshots</span>
+<span class="sd">Bright office:</span>
+<span class="sd">    Add screenshots</span>
+<span class="sd">I am optimizing for uniform brightness, but really I want uniform attention</span>
+<span class="sd">    Are there measurements on how hue/colorfulness affect this?</span>
+
+<span class="sd">CIECAM is for dyes. Switch to a model for luminous stimuli:</span>
+<span class="sd">https://www.osapublishing.org/josaa/fulltext.cfm?uri=josaa-35-12-2000&amp;id=401230</span>
+<span class="sd">&#39;&#39;&#39;</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
 </div>
     </div>
   </div>
