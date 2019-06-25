@@ -11778,25 +11778,25 @@ div#notebook {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="An-Ergonomic-Color-Scheme-For-Code">An Ergonomic Color Scheme For Code<a class="anchor-link" href="#An-Ergonomic-Color-Scheme-For-Code">&#182;</a></h3><p>Source code is often displayed in colors to make it easier to read. Popular editors offer a wide variety of community-made color schemes. Since these colors have a practical function, there should be principles guiding them beyond personal preference. In this essay, I outline a set of principles, express them as optimization constraints and goals, and compute a feasible collection of colors.</p>
+<h3 id="An-Ergonomic-Color-Scheme-For-Code">An Ergonomic Color Scheme For Code<a class="anchor-link" href="#An-Ergonomic-Color-Scheme-For-Code">&#182;</a></h3><p>Source code is often displayed in colors to make it easier to read. Popular editors offer a wide variety of community-made color schemes. Since these colors have a practical function, there should be principles guiding them beyond personal preference. In this essay, I outline a set of principles, express them as optimization constraints and goals, and compute feasible collections of colors.</p>
 <p>The concerns that the color scheme can influence are eye strain, attention management, and parsing effort.</p>
 <p>The causes of eye strain that can be affected by color schemes are the contrast ratio of the text and the overall brightness of the screen. See <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3592304/">https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3592304/</a></p>
 <blockquote><p>"The brightness has to be adjusted so that it is about the same as the surroundings and the contrast has to be adjusted to as high as possible to eliminate the discomfort."</p>
 </blockquote>
-<p>I will provide two color schemes. One light-on-dark for work in bright environments, and one dark-on-light for work in dark environments.</p>
-<p>Next, the editor should align with my desired Attention Hierarchy (see <a href="https://colorusage.arc.nasa.gov/Percept_layers_1.php">https://colorusage.arc.nasa.gov/Percept_layers_1.php</a>). If there is a particular symbol or expression that I am interested in, the editor should highlight it. Otherwise, the editor should not be distracting. The code should be a single perceptual layer - all colors should have <strong>equal brightness</strong>.</p>
-<p>Next is parsing effort. Expressions are often bounded by paired delimiters. When these delimiters are nested, I must consciously scan the text to match them properly. To reduce this effort, I can draw delimiters with <strong>saturated colors</strong>, alternating hues by nesting level. This causes the desired pair to "pop" when searched for (see <a href="https://colorusage.arc.nasa.gov/popout.php">https://colorusage.arc.nasa.gov/popout.php</a>) without much interference to the attention hierarchy otherwise.</p>
-<p>Depending on the syntax and style of the code, parsing may involve mentally separating adjacent tokens. Consider this expression:</p>
+<p>I will provide two color schemes. One dark-on-light for work in bright environments, and one light-on-dark for work in dark environments.</p>
+<p>Next, the editor should align with my desired Attention Hierarchy (see <a href="https://colorusage.arc.nasa.gov/Percept_layers_1.php">https://colorusage.arc.nasa.gov/Percept_layers_1.php</a>). If there is a particular symbol or expression that I am interested in, the editor should highlight it. Otherwise, the editor should not be distracting. The text should be a single perceptual layer - all colors should have <strong>equal brightness</strong>.</p>
+<p>Expressions are often bounded by parentheses and other paired delimiters. When these delimiters are nested, I must consciously scan the text to match them properly. To reduce this effort, I can draw delimiters with <strong>saturated colors</strong>, alternating hues by nesting level. This causes the desired pair to "pop" when searched for (see <a href="https://colorusage.arc.nasa.gov/popout.php">https://colorusage.arc.nasa.gov/popout.php</a>) without much interference to the attention hierarchy otherwise.</p>
+<p>Finally, depending on the syntax and style of the code, parsing may involve mentally separating adjacent tokens. Consider this expression:</p>
 
 <pre><code>math.abs(math.log(0.5) / 3)
 
 </code></pre>
-<p>The first tokens run together without any perceptual hints for the boundaries. I have to remember these boundaries. This is an unnecessary tax on my working memory. The dots, being mostly empty space, even hint towards an incorrect reading:</p>
+<p>The first tokens run together without any perceptual hints for the boundaries. To parse the text, I have to try different groupings of characters into tokens until I find a sensible interpretation. The dots, being mostly empty space, even hint towards an incorrect reading:</p>
 
 <pre><code>math  abs(math  log(0  5)  /  3)
 
 </code></pre>
-<p>To correct these problems, adjacent tokens should have different colors. Standard syntax highlighting is nearly ideal for this. Hue difference perception is more sensitive when the colors are near each other, so I can use <strong>desaturated colors</strong> and let the delimiters be the only saturated colors on the screen.</p>
+<p>To mitigate this problem, adjacent tokens should have different colors. The added visual structure increases the chance that I parse correctly on the first look. Standard syntax highlighting works well for this. Hue difference perception is more sensitive when the colors are near each other, so I can use <strong>desaturated colors</strong> and let the delimiters be the only saturated colors on the screen.</p>
 
 </div>
 </div>
@@ -11806,9 +11806,7 @@ div#notebook {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>I have enough constraints and desiderata now to start framing this as an optimization problem. I'll optimize over the sRGB colorspace, evaluating solution quality in a CIECAM02 perceptual model, with a crude modification to account for the Helmholtz-Kohlrausch effect (<a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2659800/">https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2659800/</a>)</p>
-<p>For the dark theme, I want three colors for delimiters that have high (and equal) brightness, high (and equal) colorfulness, and hue angles sufficiently different.</p>
-<p>Then I want four colors at the same brightness, with low colorfulness and equally spaced hues. These will be used for variables, functions, language keywords, and primitives.</p>
+<p>I'll optimize over the sRGB colorspace, evaluating solution quality in a CIECAM02 perceptual model, with a crude modification to account for the Helmholtz-Kohlrausch effect (<a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2659800/">https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2659800/</a>)</p>
 
 </div>
 </div>
@@ -11818,7 +11816,7 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[1]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># First, conversion utilities between the domain and evaluation spaces</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Conversion utilities between the domain and evaluation spaces</span>
 <span class="kn">from</span> <span class="nn">colormath.color_objects</span> <span class="k">import</span> <span class="n">sRGBColor</span><span class="p">,</span> <span class="n">LCHabColor</span><span class="p">,</span> <span class="n">LabColor</span><span class="p">,</span> <span class="n">XYZColor</span><span class="p">,</span> <span class="n">SpectralColor</span>
 <span class="kn">from</span> <span class="nn">colormath.color_conversions</span> <span class="k">import</span> <span class="n">convert_color</span>
 <span class="kn">from</span> <span class="nn">colormath.color_appearance_models</span> <span class="k">import</span> <span class="n">CIECAM02</span>
@@ -11826,7 +11824,7 @@ div#notebook {
 <span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">import</span> <span class="nn">math</span>
 
-<span class="k">def</span> <span class="nf">hue_diff</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">hue_angle_diff</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">):</span>
     <span class="n">in_one_direction</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">right</span> <span class="o">-</span> <span class="n">left</span><span class="p">)</span>
     <span class="n">in_the_other</span> <span class="o">=</span> <span class="mi">360</span> <span class="o">-</span> <span class="n">in_one_direction</span>
     <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="n">in_one_direction</span><span class="p">,</span> <span class="n">in_the_other</span><span class="p">)</span>
@@ -11838,7 +11836,7 @@ div#notebook {
     <span class="n">blue_hue</span> <span class="o">=</span> <span class="o">-</span><span class="mi">93</span>
     <span class="n">yellow_hue</span> <span class="o">=</span> <span class="mi">87</span>
     <span class="n">max_coefficient</span> <span class="o">=</span> <span class="mf">0.35</span>
-    <span class="n">chromatic_strength</span> <span class="o">=</span> <span class="n">max_coefficient</span> <span class="o">*</span> <span class="n">hue_diff</span><span class="p">(</span><span class="n">hue</span><span class="p">,</span> <span class="n">yellow_hue</span><span class="p">)</span> <span class="o">/</span> <span class="mi">180</span>
+    <span class="n">chromatic_strength</span> <span class="o">=</span> <span class="n">max_coefficient</span> <span class="o">*</span> <span class="n">hue_angle_diff</span><span class="p">(</span><span class="n">hue</span><span class="p">,</span> <span class="n">yellow_hue</span><span class="p">)</span> <span class="o">/</span> <span class="mi">180</span>
     <span class="n">multiplier</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">chromatic_strength</span> <span class="o">*</span> <span class="p">(</span><span class="n">lightness</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">saturation</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
     
     <span class="k">return</span> <span class="n">multiplier</span> <span class="o">*</span> <span class="n">brightness</span>
@@ -11852,15 +11850,13 @@ div#notebook {
     <span class="s1">&#39;ciecam_params&#39;</span><span class="p">:{</span>
         <span class="s1">&#39;l_a&#39;</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span> 
         <span class="s1">&#39;y_b&#39;</span><span class="p">:</span> <span class="n">WHITE_XYZ</span><span class="o">.</span><span class="n">xyz_y</span><span class="p">},</span> 
-    <span class="s1">&#39;background&#39;</span><span class="p">:</span> <span class="n">WHITE</span><span class="p">,</span>
-    <span class="s1">&#39;target_brightness&#39;</span><span class="p">:</span> <span class="mi">95</span>
+    <span class="s1">&#39;background&#39;</span><span class="p">:</span> <span class="n">WHITE</span>
 <span class="p">}</span>
 <span class="n">DIM_OFFICE</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s1">&#39;ciecam_params&#39;</span><span class="p">:{</span>
         <span class="s1">&#39;l_a&#39;</span><span class="p">:</span><span class="mi">30</span><span class="p">,</span> 
         <span class="s1">&#39;y_b&#39;</span><span class="p">:</span> <span class="n">BLACK_XYZ</span><span class="o">.</span><span class="n">xyz_y</span><span class="p">},</span> 
-    <span class="s1">&#39;background&#39;</span><span class="p">:</span> <span class="n">BLACK</span><span class="p">,</span>
-    <span class="s1">&#39;target_brightness&#39;</span><span class="p">:</span> <span class="mi">740</span>
+    <span class="s1">&#39;background&#39;</span><span class="p">:</span> <span class="n">BLACK</span>
 <span class="p">}</span>
 
 <span class="c1"># We are optimizing over Red/Green/Blue, but evaluating on Colorfulness/Brightness/Hue</span>
@@ -11874,11 +11870,8 @@ div#notebook {
     <span class="n">hkb</span> <span class="o">=</span> <span class="n">hk_brightness</span><span class="p">(</span><span class="n">cbh</span><span class="o">.</span><span class="n">saturation</span><span class="p">,</span> <span class="n">cbh</span><span class="o">.</span><span class="n">hue_angle</span><span class="p">,</span> <span class="n">cbh</span><span class="o">.</span><span class="n">lightness</span><span class="p">,</span> <span class="n">cbh</span><span class="o">.</span><span class="n">brightness</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">cbh</span><span class="o">.</span><span class="n">colorfulness</span><span class="p">,</span> <span class="n">hkb</span><span class="p">,</span> <span class="n">cbh</span><span class="o">.</span><span class="n">hue_angle</span>
 
-<span class="k">def</span> <span class="nf">rgb_array_to_cbh</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">office</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">apply_along_axis</span><span class="p">(</span><span class="n">rgb_row_to_cbh</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">arr</span><span class="p">,</span> <span class="n">office</span><span class="p">)</span>
-
-<span class="k">def</span> <span class="nf">to_rows</span><span class="p">(</span><span class="n">arr</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">arr</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">arr</span><span class="o">.</span><span class="n">size</span><span class="o">//</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">rgb_array_to_cbh_list</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">office</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">apply_along_axis</span><span class="p">(</span><span class="n">rgb_row_to_cbh</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">arr</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">arr</span><span class="o">.</span><span class="n">size</span><span class="o">//</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">office</span><span class="p">))</span>
 </pre></div>
 
 </div>
@@ -11894,37 +11887,32 @@ div#notebook {
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Some helper functions to look at the results</span>
 <span class="kn">from</span> <span class="nn">IPython.display</span> <span class="k">import</span> <span class="n">HTML</span>
 
-<span class="k">def</span> <span class="nf">rgb_row_to_lch</span><span class="p">(</span><span class="n">rgb</span><span class="p">):</span>
-    <span class="n">lchab</span> <span class="o">=</span> <span class="n">convert_color</span><span class="p">(</span><span class="n">sRGBColor</span><span class="p">(</span><span class="o">*</span><span class="n">rgb</span><span class="p">),</span> <span class="n">LCHabColor</span><span class="p">)</span>
-    <span class="k">return</span> <span class="p">(</span><span class="n">lchab</span><span class="o">.</span><span class="n">lch_c</span><span class="p">,</span> <span class="n">lchab</span><span class="o">.</span><span class="n">lch_l</span><span class="p">,</span> <span class="n">lchab</span><span class="o">.</span><span class="n">lch_h</span><span class="p">)</span>
-
-<span class="k">def</span> <span class="nf">hexcode_demo</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">html_demo</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">f</span><span class="s1">&#39;&#39;&#39;&lt;text style=&#39;font-weight: bold; font-family: monospaced; color: </span><span class="si">{f}</span><span class="s1">; background-color: </span><span class="si">{b}</span><span class="s1">&#39;&gt;</span><span class="si">{f}</span><span class="s1">&lt;/text&gt;&#39;&#39;&#39;</span>
 
 <span class="k">def</span> <span class="nf">rgb_row_to_html</span><span class="p">(</span><span class="n">rgb</span><span class="p">,</span> <span class="n">office</span><span class="p">):</span>
     <span class="n">foreground</span> <span class="o">=</span> <span class="n">sRGBColor</span><span class="p">(</span><span class="o">*</span><span class="n">rgb</span><span class="p">)</span><span class="o">.</span><span class="n">get_rgb_hex</span><span class="p">()</span>
     <span class="n">background</span> <span class="o">=</span> <span class="n">office</span><span class="p">[</span><span class="s1">&#39;background&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get_rgb_hex</span><span class="p">()</span>
-    <span class="k">return</span> <span class="n">hexcode_demo</span><span class="p">(</span><span class="n">foreground</span><span class="p">,</span> <span class="n">background</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">html_demo</span><span class="p">(</span><span class="n">foreground</span><span class="p">,</span> <span class="n">background</span><span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">row_to_str</span><span class="p">(</span><span class="n">row</span><span class="p">):</span>
-    <span class="k">return</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;</span><span class="si">{0:.1f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">p</span><span class="p">)</span><span class="o">.</span><span class="n">rjust</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">row</span><span class="p">])</span>
+    <span class="k">return</span> <span class="s1">&#39;       &#39;</span> <span class="o">+</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;</span><span class="si">{0:.1f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">p</span><span class="p">)</span><span class="o">.</span><span class="n">rjust</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">row</span><span class="p">])</span>
 
 <span class="k">def</span> <span class="nf">array_to_str</span><span class="p">(</span><span class="n">arr</span><span class="p">):</span>
     <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">row_to_str</span><span class="p">,</span> <span class="n">arr</span><span class="p">))</span>
 
+<span class="k">def</span> <span class="nf">sorted_by_hue_angle</span><span class="p">(</span><span class="n">cbh_colors</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="nb">sorted</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">cbh_colors</span><span class="p">,</span> <span class="n">values</span><span class="p">),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">pair</span><span class="p">:</span> <span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">]))</span>
+
 <span class="k">def</span> <span class="nf">show</span><span class="p">(</span><span class="n">office</span><span class="p">,</span> <span class="o">*</span><span class="n">results</span><span class="p">):</span>
-    <span class="n">x</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">to_rows</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">results</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-    <span class="n">model_params</span> <span class="o">=</span> <span class="n">rgb_array_to_cbh</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">office</span><span class="p">)</span>
-    <span class="n">htmls</span> <span class="o">=</span> <span class="p">[</span><span class="n">rgb_row_to_html</span><span class="p">(</span><span class="n">rgb</span><span class="p">,</span> <span class="n">office</span><span class="p">)</span> <span class="k">for</span> <span class="n">rgb</span> <span class="ow">in</span> <span class="n">x</span><span class="p">]</span>
-    <span class="n">model_params</span><span class="p">,</span> <span class="n">htmls</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="nb">sorted</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">model_params</span><span class="p">,</span> <span class="n">htmls</span><span class="p">),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">pair</span><span class="p">:</span> <span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">]))</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">cbh_colors</span> <span class="o">=</span> <span class="n">rgb_array_to_cbh_list</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">office</span><span class="p">)</span>
+    <span class="n">htmls</span> <span class="o">=</span> <span class="p">[</span><span class="n">rgb_row_to_html</span><span class="p">(</span><span class="n">rgb</span><span class="p">,</span> <span class="n">office</span><span class="p">)</span> <span class="k">for</span> <span class="n">rgb</span> <span class="ow">in</span> <span class="n">x</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="o">//</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)]</span>
     
-    <span class="n">model_params</span> <span class="o">=</span> <span class="n">array_to_str</span><span class="p">(</span><span class="n">model_params</span><span class="p">)</span>
+    <span class="n">cbh_colors</span><span class="p">,</span> <span class="n">htmls</span> <span class="o">=</span> <span class="n">sorted_by_hue_angle</span><span class="p">(</span><span class="n">cbh_colors</span><span class="p">,</span> <span class="n">htmls</span><span class="p">)</span>
     
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Model colorfulness, brightness, hue:&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">model_params</span><span class="p">)</span>
-    <span class="c1">#lch_params = array_to_str(numpy.apply_along_axis(rgb_row_to_lch, 1, x))</span>
-    <span class="c1">#print(&quot;LCHab chroma, luminance, hue:&quot;)</span>
-    <span class="c1">#print(lch_params)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">array_to_str</span><span class="p">(</span><span class="n">cbh_colors</span><span class="p">))</span>
     
     <span class="k">return</span> <span class="n">HTML</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">htmls</span><span class="p">))</span>
 </pre></div>
@@ -11934,21 +11922,26 @@ div#notebook {
 </div>
 
 </div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>I'll optimize the saturated colors first since they are more constrained. For the dark theme, I want three colors for delimiters that have high (and equal) brightness, high (and equal) colorfulness, and hue angles sufficiently different.</p>
+<p>The constraints of the sRGB color gamut at high brightness restrict the palette of saturated colors to yellow, green, and cyan. Play with <a href="http://www.hsluv.org/">http://www.hsluv.org/</a> to understand why this is the case - the green on computer monitors is much brighter than the red or blue.</p>
+
+</div>
+</div>
+</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 <div class="prompt input_prompt">In&nbsp;[3]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    The constraints of the sRGB color gamut at high brightness </span>
-<span class="sd">    restrict the palette of saturated colors to yellow -&gt; green -&gt; cyan.</span>
-<span class="sd">    Play with http://www.hsluv.org/ to understand why this is the case.</span>
-<span class="sd">    We optimize the saturated colors first since they are more constrained</span>
-<span class="sd">&#39;&#39;&#39;</span>
-<span class="n">INITIAL_GUESS_SATURATED_DIM</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span>
-       <span class="mi">1</span><span class="p">,</span>   <span class="o">.</span><span class="mi">8</span><span class="p">,</span>    <span class="mi">0</span><span class="p">,</span> 
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">INITIAL_GUESS_SATURATED_DIM</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+       <span class="mi">1</span><span class="p">,</span>    <span class="mi">1</span><span class="p">,</span>    <span class="mi">0</span><span class="p">,</span> 
        <span class="mi">0</span><span class="p">,</span>    <span class="mi">1</span><span class="p">,</span>    <span class="mi">1</span><span class="p">,</span>
-       <span class="mi">0</span><span class="p">,</span>    <span class="mi">1</span><span class="p">,</span>    <span class="mi">0</span><span class="p">]</span>
+       <span class="mi">0</span><span class="p">,</span>    <span class="mi">1</span><span class="p">,</span>    <span class="mi">0</span>
 <span class="p">])</span>
 
 <span class="n">show</span><span class="p">(</span><span class="n">DIM_OFFICE</span><span class="p">,</span> <span class="n">INITIAL_GUESS_SATURATED_DIM</span><span class="p">)</span>
@@ -11967,9 +11960,9 @@ div#notebook {
 
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>Model colorfulness, brightness, hue:
-   166.2,    758.6,   -162.4
-   202.5,    711.6,     88.4
-   305.4,    735.8,    135.8
+          166.2,    758.6,   -162.4
+          229.0,    771.0,    105.0
+          305.4,    735.8,    135.8
 </pre>
 </div>
 </div>
@@ -11979,7 +11972,7 @@ div#notebook {
 
 
 <div class="output_html rendered_html output_subarea output_execute_result">
-<text style='font-weight: bold; font-family: monospaced; color: #00ffff; background-color: #000000'>#00ffff</text><text style='font-weight: bold; font-family: monospaced; color: #ffcc00; background-color: #000000'>#ffcc00</text><text style='font-weight: bold; font-family: monospaced; color: #00ff00; background-color: #000000'>#00ff00</text>
+<text style='font-weight: bold; font-family: monospaced; color: #00ffff; background-color: #000000'>#00ffff</text><text style='font-weight: bold; font-family: monospaced; color: #ffff00; background-color: #000000'>#ffff00</text><text style='font-weight: bold; font-family: monospaced; color: #00ff00; background-color: #000000'>#00ff00</text>
 </div>
 
 </div>
@@ -11987,51 +11980,38 @@ div#notebook {
 </div>
 </div>
 
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The desiderata of the optimization can be expressed as simple functions in the evaluation space:</p>
+
+</div>
+</div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 <div class="prompt input_prompt">In&nbsp;[4]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">brightness_penalty</span><span class="p">(</span><span class="n">cbh_colors</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
-    <span class="k">return</span> <span class="nb">sum</span><span class="p">([(</span><span class="n">cbh</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">target</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="k">for</span> <span class="n">cbh</span> <span class="ow">in</span> <span class="n">cbh_colors</span><span class="p">])</span> <span class="o">/</span> <span class="mi">5</span>
-
-<span class="k">def</span> <span class="nf">delimiter_colorfulness_score</span><span class="p">(</span><span class="n">cbh_colors</span><span class="p">):</span>
-    <span class="n">delimiter_min_colorfulness</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">cbh</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">cbh</span> <span class="ow">in</span> <span class="n">cbh_colors</span><span class="p">)</span>
-    <span class="n">delimiter_range_colorfulness</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">cbh</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">cbh</span> <span class="ow">in</span> <span class="n">cbh_colors</span><span class="p">)</span> <span class="o">-</span> <span class="n">delimiter_min_colorfulness</span>
-    <span class="k">return</span> <span class="n">delimiter_min_colorfulness</span> <span class="o">-</span> <span class="n">delimiter_range_colorfulness</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="mi">100</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">min_colorfulness</span><span class="p">(</span><span class="n">cbh_colors</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="n">cbh</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">cbh</span> <span class="ow">in</span> <span class="n">cbh_colors</span><span class="p">)</span>
     
-<span class="k">def</span> <span class="nf">symbol_colorfulness_penalty</span><span class="p">(</span><span class="n">cbh_colors</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">colorfulness_penalty</span><span class="p">(</span><span class="n">cbh_colors</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
     <span class="k">return</span> <span class="nb">sum</span><span class="p">([(</span><span class="n">cbh</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">target</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="k">for</span> <span class="n">cbh</span> <span class="ow">in</span> <span class="n">cbh_colors</span><span class="p">])</span>
 
-<span class="k">def</span> <span class="nf">hue_overlap_penalty</span><span class="p">(</span><span class="n">cbh_colors</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">brightness_penalty</span><span class="p">(</span><span class="n">cbh_colors</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">sum</span><span class="p">([(</span><span class="n">cbh</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">target</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="k">for</span> <span class="n">cbh</span> <span class="ow">in</span> <span class="n">cbh_colors</span><span class="p">])</span>
+
+<span class="k">def</span> <span class="nf">hue_nearness_penalty</span><span class="p">(</span><span class="n">cbh_colors</span><span class="p">):</span>
     <span class="n">colors</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">cbh_colors</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">cbh</span><span class="p">:</span> <span class="n">cbh</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
     <span class="n">penalty</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">cbh</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">colors</span><span class="p">):</span>
-        <span class="n">hd</span> <span class="o">=</span> <span class="n">hue_diff</span><span class="p">(</span><span class="n">cbh</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">colors</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">])</span>
-        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">cbh</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">colors</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">20</span><span class="p">:</span>
-            <span class="c1"># Any two colors with similar hues is annoying</span>
-            <span class="n">penalty</span> <span class="o">+=</span> <span class="mi">300</span> <span class="o">/</span> <span class="p">(</span><span class="mi">5</span> <span class="o">+</span> <span class="n">hd</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># But if they are equally saturated, that is fatal</span>
-            <span class="n">penalty</span> <span class="o">+=</span> <span class="mi">500</span> <span class="o">/</span> <span class="p">(</span><span class="mi">5</span> <span class="o">+</span> <span class="n">hd</span><span class="p">)</span>
+        <span class="n">hd</span> <span class="o">=</span> <span class="n">hue_angle_diff</span><span class="p">(</span><span class="n">cbh</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">colors</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">])</span>
+        <span class="n">penalty</span> <span class="o">+=</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">hd</span> <span class="o">/</span> <span class="mi">15</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">penalty</span>
-
-
-<span class="k">def</span> <span class="nf">rgb_delimiter_penalty</span><span class="p">(</span><span class="n">rgb_delimiters</span><span class="p">,</span> <span class="n">office</span><span class="p">):</span>
-    <span class="n">shaped_rgb</span> <span class="o">=</span> <span class="n">to_rows</span><span class="p">(</span><span class="n">rgb_delimiters</span><span class="p">)</span>
-    <span class="n">cbh_delimiters</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">rgb_array_to_cbh</span><span class="p">(</span><span class="n">shaped_rgb</span><span class="p">,</span> <span class="n">office</span><span class="p">))</span>
-    <span class="k">return</span> <span class="o">-</span><span class="n">delimiter_colorfulness_score</span><span class="p">(</span><span class="n">cbh_delimiters</span><span class="p">)</span> \
-            <span class="o">+</span> <span class="n">brightness_penalty</span><span class="p">(</span><span class="n">cbh_delimiters</span><span class="p">,</span> <span class="n">office</span><span class="p">[</span><span class="s1">&#39;target_brightness&#39;</span><span class="p">])</span> \
-            <span class="o">+</span> <span class="n">hue_overlap_penalty</span><span class="p">(</span><span class="n">cbh_delimiters</span><span class="p">)</span>
-
-<span class="k">def</span> <span class="nf">rgb_symbol_penalty</span><span class="p">(</span><span class="n">rgb_symbols</span><span class="p">,</span> <span class="n">cbh_delimiters</span><span class="p">,</span> <span class="n">office</span><span class="p">):</span>
-    <span class="n">shaped_rgb</span> <span class="o">=</span> <span class="n">to_rows</span><span class="p">(</span><span class="n">rgb_symbols</span><span class="p">)</span>
-    <span class="n">cbh_symbols</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">rgb_array_to_cbh</span><span class="p">(</span><span class="n">shaped_rgb</span><span class="p">,</span> <span class="n">office</span><span class="p">))</span>
-    <span class="n">target_colorfulness</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="n">cbh</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">cbh</span> <span class="ow">in</span> <span class="n">cbh_delimiters</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cbh_delimiters</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">symbol_colorfulness_penalty</span><span class="p">(</span><span class="n">cbh_symbols</span><span class="p">,</span> <span class="n">target_colorfulness</span><span class="p">)</span> \
-            <span class="o">+</span> <span class="n">brightness_penalty</span><span class="p">(</span><span class="n">cbh_symbols</span><span class="p">,</span> <span class="n">office</span><span class="p">[</span><span class="s1">&#39;target_brightness&#39;</span><span class="p">])</span> \
-            <span class="o">+</span> <span class="n">hue_overlap_penalty</span><span class="p">(</span><span class="n">cbh_symbols</span> <span class="o">+</span> <span class="n">cbh_delimiters</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -12039,18 +12019,28 @@ div#notebook {
 </div>
 
 </div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>My optimization goal is a balance of concerns, but I don't have a totally justified objective function to mediate tradeoffs. Instead, the scaling factors, target brightness, and target colorfulness for symbols are found through trial-and-error.</p>
+
+</div>
+</div>
+</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 <div class="prompt input_prompt">In&nbsp;[5]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">dim_delimiters</span> <span class="o">=</span> <span class="n">optimize</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span>
-    <span class="n">rgb_delimiter_penalty</span><span class="p">,</span> 
-    <span class="n">INITIAL_GUESS_SATURATED_DIM</span><span class="p">,</span>
-    <span class="n">method</span><span class="o">=</span><span class="s2">&quot;L-BFGS-B&quot;</span><span class="p">,</span> 
-    <span class="n">bounds</span><span class="o">=</span><span class="p">[(</span><span class="n">EPSILON</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span> <span class="o">*</span> <span class="n">INITIAL_GUESS_SATURATED_DIM</span><span class="o">.</span><span class="n">size</span><span class="p">,</span>
-    <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">DIM_OFFICE</span><span class="p">,)</span>
-<span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">rgb_delimiter_penalty</span><span class="p">(</span><span class="n">rgb_delimiters</span><span class="p">,</span> <span class="n">target_brightness</span><span class="p">,</span> <span class="n">office</span><span class="p">):</span>
+    <span class="n">cbh_delimiters</span> <span class="o">=</span> <span class="n">rgb_array_to_cbh_list</span><span class="p">(</span><span class="n">rgb_delimiters</span><span class="p">,</span> <span class="n">office</span><span class="p">)</span>
+    <span class="n">min_color</span> <span class="o">=</span> <span class="n">min_colorfulness</span><span class="p">(</span><span class="n">cbh_delimiters</span><span class="p">)</span>
+    <span class="k">return</span> <span class="o">-</span><span class="n">min_color</span> \
+           <span class="o">+</span> <span class="n">colorfulness_penalty</span><span class="p">(</span><span class="n">cbh_delimiters</span><span class="p">,</span> <span class="n">min_color</span><span class="p">)</span> <span class="o">/</span> <span class="mi">100</span> \
+           <span class="o">+</span> <span class="n">brightness_penalty</span><span class="p">(</span><span class="n">cbh_delimiters</span><span class="p">,</span> <span class="n">target_brightness</span><span class="p">)</span> <span class="o">/</span> <span class="mi">5</span> \
+           <span class="o">+</span> <span class="n">hue_nearness_penalty</span><span class="p">(</span><span class="n">cbh_delimiters</span><span class="p">)</span> <span class="o">*</span> <span class="mi">140</span>
 </pre></div>
 
 </div>
@@ -12061,6 +12051,25 @@ div#notebook {
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 <div class="prompt input_prompt">In&nbsp;[6]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">dim_delimiters</span> <span class="o">=</span> <span class="n">optimize</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span>
+    <span class="n">rgb_delimiter_penalty</span><span class="p">,</span> 
+    <span class="n">INITIAL_GUESS_SATURATED_DIM</span><span class="p">,</span>
+    <span class="n">method</span><span class="o">=</span><span class="s2">&quot;L-BFGS-B&quot;</span><span class="p">,</span> 
+    <span class="n">bounds</span><span class="o">=</span><span class="p">[(</span><span class="n">EPSILON</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span> <span class="o">*</span> <span class="n">INITIAL_GUESS_SATURATED_DIM</span><span class="o">.</span><span class="n">size</span><span class="p">,</span>
+    <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="mi">740</span><span class="p">,</span> <span class="n">DIM_OFFICE</span><span class="p">,)</span>
+<span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[7]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">show</span><span class="p">(</span><span class="n">DIM_OFFICE</span><span class="p">,</span> <span class="n">dim_delimiters</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
@@ -12079,19 +12088,19 @@ div#notebook {
 
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>Model colorfulness, brightness, hue:
-   165.9,    739.7,   -154.3
-   185.9,    739.6,     95.8
-   165.9,    741.1,    154.8
+          165.9,    739.6,   -154.2
+          165.9,    739.8,     94.5
+          165.9,    740.0,    150.1
 </pre>
 </div>
 </div>
 
 <div class="output_area">
-<div class="prompt output_prompt">Out[6]:</div>
+<div class="prompt output_prompt">Out[7]:</div>
 
 
 <div class="output_html rendered_html output_subarea output_execute_result">
-<text style='font-weight: bold; font-family: monospaced; color: #00f0ff; background-color: #000000'>#00f0ff</text><text style='font-weight: bold; font-family: monospaced; color: #ffe43d; background-color: #000000'>#ffe43d</text><text style='font-weight: bold; font-family: monospaced; color: #64fcab; background-color: #000000'>#64fcab</text>
+<text style='font-weight: bold; font-family: monospaced; color: #00efff; background-color: #000000'>#00efff</text><text style='font-weight: bold; font-family: monospaced; color: #ffe454; background-color: #000000'>#ffe454</text><text style='font-weight: bold; font-family: monospaced; color: #72fba2; background-color: #000000'>#72fba2</text>
 </div>
 
 </div>
@@ -12099,18 +12108,28 @@ div#notebook {
 </div>
 </div>
 
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Then I want four colors at the same brightness, with low colorfulness and equally spaced hues. These will be used for variables, functions, language keywords, and primitives.</p>
+
+</div>
+</div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[7]:</div>
+<div class="prompt input_prompt">In&nbsp;[8]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">INITIAL_GUESS_PASTEL_DIM</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">INITIAL_GUESS_PASTEL_DIM</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
      <span class="mi">1</span><span class="p">,</span> <span class="o">.</span><span class="mi">9</span><span class="p">,</span> <span class="o">.</span><span class="mi">8</span><span class="p">,</span>
     <span class="o">.</span><span class="mi">7</span><span class="p">,</span> <span class="o">.</span><span class="mi">9</span><span class="p">,</span> <span class="o">.</span><span class="mi">7</span><span class="p">,</span>
      <span class="mi">1</span><span class="p">,</span> <span class="o">.</span><span class="mi">8</span><span class="p">,</span>  <span class="mi">1</span><span class="p">,</span>
     <span class="o">.</span><span class="mi">8</span><span class="p">,</span> <span class="o">.</span><span class="mi">8</span><span class="p">,</span>  <span class="mi">1</span>
-<span class="p">]])</span>
+<span class="p">])</span>
 </pre></div>
 
 </div>
@@ -12120,16 +12139,33 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[8]:</div>
+<div class="prompt input_prompt">In&nbsp;[10]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">cbh_delimiters</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">rgb_array_to_cbh</span><span class="p">(</span><span class="n">to_rows</span><span class="p">(</span><span class="n">dim_delimiters</span><span class="o">.</span><span class="n">x</span><span class="p">),</span> <span class="n">DIM_OFFICE</span><span class="p">))</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">rgb_symbol_penalty</span><span class="p">(</span><span class="n">rgb_symbols</span><span class="p">,</span> <span class="n">cbh_delimiters</span><span class="p">,</span> <span class="n">target_brightness</span><span class="p">,</span> <span class="n">target_colorfulness</span><span class="p">,</span> <span class="n">office</span><span class="p">):</span>
+    <span class="n">cbh_symbols</span> <span class="o">=</span> <span class="n">rgb_array_to_cbh_list</span><span class="p">(</span><span class="n">rgb_symbols</span><span class="p">,</span> <span class="n">office</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">colorfulness_penalty</span><span class="p">(</span><span class="n">cbh_symbols</span><span class="p">,</span> <span class="n">target_colorfulness</span><span class="p">)</span> <span class="o">/</span> <span class="mi">7</span> \
+            <span class="o">+</span> <span class="n">brightness_penalty</span><span class="p">(</span><span class="n">cbh_symbols</span><span class="p">,</span> <span class="n">target_brightness</span><span class="p">)</span> \
+            <span class="o">+</span> <span class="n">hue_nearness_penalty</span><span class="p">(</span><span class="n">cbh_symbols</span> <span class="o">+</span> <span class="n">cbh_delimiters</span><span class="p">)</span> <span class="o">*</span> <span class="mi">140</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[11]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">cbh_delimiters</span> <span class="o">=</span> <span class="n">rgb_array_to_cbh_list</span><span class="p">(</span><span class="n">dim_delimiters</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">DIM_OFFICE</span><span class="p">)</span>
 <span class="n">dim_symbols</span> <span class="o">=</span> <span class="n">optimize</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span>
     <span class="n">rgb_symbol_penalty</span><span class="p">,</span> 
     <span class="n">INITIAL_GUESS_PASTEL_DIM</span><span class="p">,</span>
     <span class="n">method</span><span class="o">=</span><span class="s2">&quot;L-BFGS-B&quot;</span><span class="p">,</span> 
     <span class="n">bounds</span><span class="o">=</span><span class="p">[(</span><span class="n">EPSILON</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span> <span class="o">*</span> <span class="n">INITIAL_GUESS_PASTEL_DIM</span><span class="o">.</span><span class="n">size</span><span class="p">,</span>
-    <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">cbh_delimiters</span><span class="p">,</span><span class="n">DIM_OFFICE</span><span class="p">,)</span>
+    <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">cbh_delimiters</span><span class="p">,</span> <span class="mi">740</span><span class="p">,</span> <span class="mi">69</span><span class="p">,</span> <span class="n">DIM_OFFICE</span><span class="p">,)</span>
 <span class="p">)</span>
 </pre></div>
 
@@ -12140,7 +12176,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[9]:</div>
+<div class="prompt input_prompt">In&nbsp;[12]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">show</span><span class="p">(</span><span class="n">DIM_OFFICE</span><span class="p">,</span> <span class="n">dim_symbols</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">dim_delimiters</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
@@ -12159,23 +12195,23 @@ div#notebook {
 
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>Model colorfulness, brightness, hue:
-   165.9,    739.7,   -154.3
-    86.2,    739.1,   -124.2
-    86.3,    740.0,    -27.8
-    86.1,    738.4,     81.4
-   185.9,    739.6,     95.8
-    86.3,    740.0,    125.3
-   165.9,    741.1,    154.8
+          165.9,    739.6,   -154.2
+           69.0,    740.0,    -86.3
+           68.8,    740.0,    -18.4
+           64.2,    738.8,     70.8
+          165.9,    739.8,     94.5
+           69.0,    740.0,    122.3
+          165.9,    740.0,    150.1
 </pre>
 </div>
 </div>
 
 <div class="output_area">
-<div class="prompt output_prompt">Out[9]:</div>
+<div class="prompt output_prompt">Out[12]:</div>
 
 
 <div class="output_html rendered_html output_subarea output_execute_result">
-<text style='font-weight: bold; font-family: monospaced; color: #00f0ff; background-color: #000000'>#00f0ff</text><text style='font-weight: bold; font-family: monospaced; color: #b4e1ff; background-color: #000000'>#b4e1ff</text><text style='font-weight: bold; font-family: monospaced; color: #ffc9f6; background-color: #000000'>#ffc9f6</text><text style='font-weight: bold; font-family: monospaced; color: #ffe09e; background-color: #000000'>#ffe09e</text><text style='font-weight: bold; font-family: monospaced; color: #ffe43d; background-color: #000000'>#ffe43d</text><text style='font-weight: bold; font-family: monospaced; color: #ceefaf; background-color: #000000'>#ceefaf</text><text style='font-weight: bold; font-family: monospaced; color: #64fcab; background-color: #000000'>#64fcab</text>
+<text style='font-weight: bold; font-family: monospaced; color: #00efff; background-color: #000000'>#00efff</text><text style='font-weight: bold; font-family: monospaced; color: #d4d8ff; background-color: #000000'>#d4d8ff</text><text style='font-weight: bold; font-family: monospaced; color: #ffceed; background-color: #000000'>#ffceed</text><text style='font-weight: bold; font-family: monospaced; color: #ffdeb2; background-color: #000000'>#ffdeb2</text><text style='font-weight: bold; font-family: monospaced; color: #ffe454; background-color: #000000'>#ffe454</text><text style='font-weight: bold; font-family: monospaced; color: #d6edb9; background-color: #000000'>#d6edb9</text><text style='font-weight: bold; font-family: monospaced; color: #72fba2; background-color: #000000'>#72fba2</text>
 </div>
 
 </div>
@@ -12194,22 +12230,32 @@ div#notebook {
 </div>
 </div>
 </div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>For a bright office, I want a dark-on-light theme.</p>
+
+</div>
+</div>
+</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[10]:</div>
+<div class="prompt input_prompt">In&nbsp;[13]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">INITIAL_GUESS_SATURATED_BRIGHT</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">INITIAL_GUESS_SATURATED_BRIGHT</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
       <span class="o">.</span><span class="mi">8</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>   <span class="mi">0</span><span class="p">,</span> 
       <span class="o">.</span><span class="mi">6</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="o">.</span><span class="mi">5</span><span class="p">,</span>
-       <span class="mi">0</span><span class="p">,</span> <span class="o">.</span><span class="mi">3</span><span class="p">,</span>   <span class="mi">1</span><span class="p">,]</span>
+       <span class="mi">0</span><span class="p">,</span> <span class="o">.</span><span class="mi">3</span><span class="p">,</span>   <span class="mi">1</span><span class="p">,</span>
 <span class="p">])</span>
-<span class="n">INITIAL_GUESS_PASTEL_BRIGHT</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span>
+<span class="n">INITIAL_GUESS_PASTEL_BRIGHT</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
       <span class="o">.</span><span class="mi">5</span><span class="p">,</span> <span class="o">.</span><span class="mi">4</span><span class="p">,</span>  <span class="o">.</span><span class="mi">5</span><span class="p">,</span>
       <span class="o">.</span><span class="mi">4</span><span class="p">,</span> <span class="o">.</span><span class="mi">5</span><span class="p">,</span>  <span class="o">.</span><span class="mi">5</span><span class="p">,</span> 
       <span class="o">.</span><span class="mi">5</span><span class="p">,</span> <span class="o">.</span><span class="mi">5</span><span class="p">,</span>  <span class="o">.</span><span class="mi">4</span><span class="p">,</span>
       <span class="o">.</span><span class="mi">4</span><span class="p">,</span> <span class="o">.</span><span class="mi">5</span><span class="p">,</span>  <span class="o">.</span><span class="mi">4</span>
-<span class="p">]])</span>
+<span class="p">])</span>
 
 <span class="n">show</span><span class="p">(</span><span class="n">BRIGHT_OFFICE</span><span class="p">,</span> <span class="n">INITIAL_GUESS_SATURATED_BRIGHT</span><span class="p">,</span> <span class="n">INITIAL_GUESS_PASTEL_BRIGHT</span><span class="p">)</span>
 </pre></div>
@@ -12227,19 +12273,19 @@ div#notebook {
 
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>Model colorfulness, brightness, hue:
-    12.6,     98.8,   -161.5
-    70.5,     85.2,   -101.9
-    16.6,     92.8,    -34.7
-    57.5,     79.2,    -19.3
-    83.2,     92.7,     32.2
-    11.5,    100.9,    101.7
-    15.7,     97.5,    142.2
+           12.6,     98.8,   -161.5
+           70.5,     85.2,   -101.9
+           16.6,     92.8,    -34.7
+           57.5,     79.2,    -19.3
+           83.2,     92.7,     32.2
+           11.5,    100.9,    101.7
+           15.7,     97.5,    142.2
 </pre>
 </div>
 </div>
 
 <div class="output_area">
-<div class="prompt output_prompt">Out[10]:</div>
+<div class="prompt output_prompt">Out[13]:</div>
 
 
 <div class="output_html rendered_html output_subarea output_execute_result">
@@ -12254,7 +12300,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[11]:</div>
+<div class="prompt input_prompt">In&nbsp;[14]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">bright_delimiters</span> <span class="o">=</span> <span class="n">optimize</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span>
@@ -12262,7 +12308,7 @@ div#notebook {
     <span class="n">INITIAL_GUESS_SATURATED_BRIGHT</span><span class="p">,</span>
     <span class="n">method</span><span class="o">=</span><span class="s2">&quot;L-BFGS-B&quot;</span><span class="p">,</span> 
     <span class="n">bounds</span><span class="o">=</span><span class="p">[(</span><span class="n">EPSILON</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span> <span class="o">*</span> <span class="n">INITIAL_GUESS_SATURATED_BRIGHT</span><span class="o">.</span><span class="n">size</span><span class="p">,</span>
-    <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">BRIGHT_OFFICE</span><span class="p">,)</span>
+    <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="mi">95</span><span class="p">,</span> <span class="n">BRIGHT_OFFICE</span><span class="p">,)</span>
 <span class="p">)</span>
 </pre></div>
 
@@ -12273,7 +12319,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[12]:</div>
+<div class="prompt input_prompt">In&nbsp;[15]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">show</span><span class="p">(</span><span class="n">BRIGHT_OFFICE</span><span class="p">,</span> <span class="n">bright_delimiters</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
@@ -12292,19 +12338,19 @@ div#notebook {
 
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>Model colorfulness, brightness, hue:
-    68.6,     94.9,   -103.1
-    68.6,     95.8,    -21.5
-    68.7,     95.2,     39.6
+           68.8,     94.8,   -103.6
+           68.8,     95.7,    -34.4
+           68.8,     95.1,     39.5
 </pre>
 </div>
 </div>
 
 <div class="output_area">
-<div class="prompt output_prompt">Out[12]:</div>
+<div class="prompt output_prompt">Out[15]:</div>
 
 
 <div class="output_html rendered_html output_subarea output_execute_result">
-<text style='font-weight: bold; font-family: monospaced; color: #0d63ff; background-color: #ffffff'>#0d63ff</text><text style='font-weight: bold; font-family: monospaced; color: #be00a6; background-color: #ffffff'>#be00a6</text><text style='font-weight: bold; font-family: monospaced; color: #c53700; background-color: #ffffff'>#c53700</text>
+<text style='font-weight: bold; font-family: monospaced; color: #0064ff; background-color: #ffffff'>#0064ff</text><text style='font-weight: bold; font-family: monospaced; color: #b500c5; background-color: #ffffff'>#b500c5</text><text style='font-weight: bold; font-family: monospaced; color: #c53700; background-color: #ffffff'>#c53700</text>
 </div>
 
 </div>
@@ -12315,16 +12361,16 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[13]:</div>
+<div class="prompt input_prompt">In&nbsp;[16]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">cbh_delimiters</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">rgb_array_to_cbh</span><span class="p">(</span><span class="n">to_rows</span><span class="p">(</span><span class="n">bright_delimiters</span><span class="o">.</span><span class="n">x</span><span class="p">),</span> <span class="n">BRIGHT_OFFICE</span><span class="p">))</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">cbh_delimiters</span> <span class="o">=</span> <span class="n">rgb_array_to_cbh_list</span><span class="p">(</span><span class="n">bright_delimiters</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">BRIGHT_OFFICE</span><span class="p">)</span>
 <span class="n">bright_symbols</span> <span class="o">=</span> <span class="n">optimize</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span>
     <span class="n">rgb_symbol_penalty</span><span class="p">,</span> 
     <span class="n">INITIAL_GUESS_PASTEL_BRIGHT</span><span class="p">,</span>
     <span class="n">method</span><span class="o">=</span><span class="s2">&quot;L-BFGS-B&quot;</span><span class="p">,</span> 
     <span class="n">bounds</span><span class="o">=</span><span class="p">[(</span><span class="n">EPSILON</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span> <span class="o">*</span> <span class="n">INITIAL_GUESS_PASTEL_BRIGHT</span><span class="o">.</span><span class="n">size</span><span class="p">,</span>
-    <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">cbh_delimiters</span><span class="p">,</span><span class="n">BRIGHT_OFFICE</span><span class="p">,)</span>
+    <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">cbh_delimiters</span><span class="p">,</span> <span class="mi">95</span><span class="p">,</span> <span class="mf">28.5</span><span class="p">,</span> <span class="n">BRIGHT_OFFICE</span><span class="p">,)</span>
 <span class="p">)</span>
 </pre></div>
 
@@ -12335,7 +12381,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[14]:</div>
+<div class="prompt input_prompt">In&nbsp;[17]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">show</span><span class="p">(</span><span class="n">BRIGHT_OFFICE</span><span class="p">,</span> <span class="n">bright_delimiters</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">bright_symbols</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
@@ -12354,23 +12400,23 @@ div#notebook {
 
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>Model colorfulness, brightness, hue:
-    34.3,     95.0,   -149.2
-    68.6,     94.9,   -103.1
-    34.3,     95.0,    -62.3
-    68.6,     95.8,    -21.5
-    68.7,     95.2,     39.6
-    34.3,     95.0,     86.6
-    34.3,     95.0,    148.7
+           28.5,     95.0,   -157.8
+           68.8,     94.8,   -103.6
+           28.5,     95.0,    -69.0
+           68.8,     95.7,    -34.4
+           68.8,     95.1,     39.5
+           28.5,     95.0,     93.7
+           28.5,     95.0,    148.0
 </pre>
 </div>
 </div>
 
 <div class="output_area">
-<div class="prompt output_prompt">Out[14]:</div>
+<div class="prompt output_prompt">Out[17]:</div>
 
 
 <div class="output_html rendered_html output_subarea output_execute_result">
-<text style='font-weight: bold; font-family: monospaced; color: #00818f; background-color: #ffffff'>#00818f</text><text style='font-weight: bold; font-family: monospaced; color: #0d63ff; background-color: #ffffff'>#0d63ff</text><text style='font-weight: bold; font-family: monospaced; color: #7e62a7; background-color: #ffffff'>#7e62a7</text><text style='font-weight: bold; font-family: monospaced; color: #be00a6; background-color: #ffffff'>#be00a6</text><text style='font-weight: bold; font-family: monospaced; color: #c53700; background-color: #ffffff'>#c53700</text><text style='font-weight: bold; font-family: monospaced; color: #8b7021; background-color: #ffffff'>#8b7021</text><text style='font-weight: bold; font-family: monospaced; color: #388450; background-color: #ffffff'>#388450</text>
+<text style='font-weight: bold; font-family: monospaced; color: #2f8084; background-color: #ffffff'>#2f8084</text><text style='font-weight: bold; font-family: monospaced; color: #0064ff; background-color: #ffffff'>#0064ff</text><text style='font-weight: bold; font-family: monospaced; color: #77689e; background-color: #ffffff'>#77689e</text><text style='font-weight: bold; font-family: monospaced; color: #b500c5; background-color: #ffffff'>#b500c5</text><text style='font-weight: bold; font-family: monospaced; color: #c53700; background-color: #ffffff'>#c53700</text><text style='font-weight: bold; font-family: monospaced; color: #817432; background-color: #ffffff'>#817432</text><text style='font-weight: bold; font-family: monospaced; color: #488256; background-color: #ffffff'>#488256</text>
 </div>
 
 </div>
@@ -12396,36 +12442,14 @@ div#notebook {
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="sd">&#39;&#39;&#39;Future work:</span>
 <span class="sd">Dim office:</span>
-<span class="sd">    delimiter green seems too close to delimiter blue</span>
-<span class="sd">        is this model perceptually uniform on hue?</span>
 <span class="sd">    delimiter yellow seems darker</span>
-<span class="sd">        increase HK effect max?</span>
+<span class="sd">        decrease HK effect max?</span>
 <span class="sd">Screenshots are unfairly generous - the two most common symbol colors are opposite hues</span>
 <span class="sd">I am optimizing for uniform brightness, but really I want uniform attention</span>
 <span class="sd">    Are there measurements on how hue/colorfulness affect this?</span>
 
 <span class="sd">CIECAM is for dyes. Switch to a model for luminous stimuli:</span>
 <span class="sd">https://www.osapublishing.org/josaa/fulltext.cfm?uri=josaa-35-12-2000&amp;id=401230</span>
-<span class="sd">&#39;&#39;&#39;</span>
-</pre></div>
-
-</div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="sd">&#39;&#39;&#39;cleanup</span>
-<span class="sd">explain more magic constants (especially ones found through trial and error)</span>
-<span class="sd">show() should line up parameters with the displayed colors. </span>
-<span class="sd">that &quot;monospaced&quot; font family is somehow not monospaced</span>
-<span class="sd">refactor to classes?</span>
-<span class="sd">    eh, not at the rule-of-three yet</span>
-<span class="sd">        </span>
 <span class="sd">&#39;&#39;&#39;</span>
 </pre></div>
 
