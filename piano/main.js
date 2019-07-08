@@ -6543,7 +6543,13 @@ var author$project$Main$view = function (oldModel) {
 					[
 						elm$html$Html$Attributes$value(oldModel.keyboard.layout),
 						elm$html$Html$Events$onInput(author$project$KeyHtml$NewLayout),
-						A2(elm$html$Html$Attributes$style, 'margin-top', '2px')
+						A2(elm$html$Html$Attributes$style, 'margin-top', '2px'),
+						A2(
+						elm$html$Html$Attributes$style,
+						'height',
+						elm$core$String$fromFloat(
+							1.2 * elm$core$List$length(
+								elm$core$String$lines(oldModel.keyboard.layout))) + 'em')
 					]),
 				_List_Nil),
 				A2(
