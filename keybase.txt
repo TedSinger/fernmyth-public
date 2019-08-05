@@ -1,0 +1,56 @@
+==================================================================
+https://keybase.io/tedsinger
+--------------------------------------------------------------------
+
+I hereby claim:
+
+  * I am an admin of https://fernmyth.net
+  * I am tedsinger (https://keybase.io/tedsinger) on keybase.
+  * I have a public key ASAENoGwzO_qpe_sWw6lVL_1LN_jashqkKSzR3RxaEGg6Ao
+
+To do so, I am signing this object:
+
+{
+  "body": {
+    "key": {
+      "eldest_kid": "0120043681b0ccefeaa5efec5b0ea554bff52cdfe36ac86a90a4b34774716841a0e80a",
+      "host": "keybase.io",
+      "kid": "0120043681b0ccefeaa5efec5b0ea554bff52cdfe36ac86a90a4b34774716841a0e80a",
+      "uid": "f2250e963a3e1f6e6ba87cede6753219",
+      "username": "tedsinger"
+    },
+    "merkle_root": {
+      "ctime": 1564964079,
+      "hash": "ec40ea27b378baf3c95a11682568cbf51185cf18fcb89b6a5fd78c6ff92a4cdbbccc48e9d50ef70d738d7b9ff807e6957b1214ae782e8e05b02d907771f1fef3",
+      "hash_meta": "3e71d669d3f27808ce6e7061a25f30d024dfb36149f5bea8d7956da6a1822aae",
+      "seqno": 5937464
+    },
+    "service": {
+      "entropy": "bdnKkzLwtMpePwjBxsBU+uky",
+      "hostname": "fernmyth.net",
+      "protocol": "https:"
+    },
+    "type": "web_service_binding",
+    "version": 2
+  },
+  "client": {
+    "name": "keybase.io go client",
+    "version": "4.2.1"
+  },
+  "ctime": 1564964089,
+  "expire_in": 504576000,
+  "prev": "3733d74f9f22591a9ec66fcfaf14ef31dde5b334d0c214ef0ea38ce07712a96e",
+  "seqno": 12,
+  "tag": "signature"
+}
+
+which yields the signature:
+
+hKRib2R5hqhkZXRhY2hlZMOpaGFzaF90eXBlCqNrZXnEIwEgBDaBsMzv6qXv7FsOpVS/9Szf42rIapCks0d0cWhBoOgKp3BheWxvYWTESpcCDMQgNzPXT58iWRqexm/PrxTvMd3lszTQwhTvDqOM4HcSqW7EIJfSO/aKzqXQwC5dcN36t4ymkZy+WItb0djsLoYqtN+6AgHCo3NpZ8RA16Ug+TPvLSUj21saGH4Ws1S2nyghJ1XCH4zVVh6pD5z532Ii1Y4vrNbKVWLveHpxjITmijk1YhZdvDBc9PUoD6hzaWdfdHlwZSCkaGFzaIKkdHlwZQildmFsdWXEIIFkj8x4C5DY25jT95pUL2ybTb5FxW97kiHBP6FXI/q5o3RhZ80CAqd2ZXJzaW9uAQ==
+
+And finally, I am proving ownership of this host by posting or
+appending to this document.
+
+View my publicly-auditable identity here: https://keybase.io/tedsinger
+
+==================================================================
