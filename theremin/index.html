@@ -1,0 +1,94 @@
+<head>
+    <meta charset="UTF-8">
+    <title>A Mobile Theremin</title>
+</head>
+<body>
+    <h1>Touch the screen to annoy your friends!</h1>
+
+    <script>
+        function startup() {
+            var el = document.querySelector("body");
+            el.addEventListener("touchstart", handleStart, false);
+            el.addEventListener("touchend", handleEnd, false);
+            el.addEventListener("touchcancel", handleCancel, false);
+            el.addEventListener("touchmove", handleMove, false);
+        }
+
+        var nodes = {};
+
+        function handleStart(ev) {
+            ev.preventDefault();
+            touches = ev.changedTouches;
+            for (var i = 0; i < touches.length; i++) {
+                syncTone(touches[i]);
+            }
+        };
+        function handleEnd(ev) {
+            ev.preventDefault();
+            for (var i = 0; i < touches.length; i++) {
+                killTone(touches[i]);
+            };
+        };
+        function handleCancel(ev) {
+            ev.preventDefault();
+            for (var i = 0; i < touches.length; i++) {
+                killTone(touches[i]);
+            };
+        };
+        function handleMove(ev) {
+            ev.preventDefault();
+            touches = ev.changedTouches;
+            for (var i = 0; i < touches.length; i++) {
+                syncTone(touches[i]);
+            }
+        };
+
+        function killTone(t) {
+            if (nodes[t.identifier]) {
+                gn = nodes[t.identifier][0];
+                osn = nodes[t.identifier][1];
+                osn.stop();
+                gn.disconnect();
+                delete (nodes[t.identifier]);
+            }
+        }
+
+        function syncTone(t) {
+            if (!nodes.ac) {
+                initAC()
+            }
+
+            y = t.clientY;
+            f = t.force;
+            if (!nodes[t.identifier]) {
+                oscillator = ac.createOscillator();
+                gainNode = ac.createGain();
+                cm = nodes.cm;
+                gainNode.connect(cm);
+                oscillator.connect(gainNode);
+                oscillator.start();
+                nodes[t.identifier] = [gainNode, oscillator];
+            }
+
+            gn = nodes[t.identifier][0];
+            osn = nodes[t.identifier][1];
+            osn.frequency.value = y + 220;
+            gn.gain.value = f;
+        }
+
+        function initAC() {
+            if ((typeof (AudioContext) === "undefined" && typeof (webkitAudioContext) !== "undefined")) {
+                AudioContext = webkitAudioContext;
+            }
+
+            ac = new AudioContext();
+            nodes.ac = ac
+            channelMerger = ac.createChannelMerger();
+            finalGainNode = ac.createGain();
+            channelMerger.connect(finalGainNode);
+            finalGainNode.connect(ac.destination);
+            nodes.cm = channelMerger;
+        }
+        document.addEventListener("DOMContentLoaded", startup);
+    </script>
+</body>
