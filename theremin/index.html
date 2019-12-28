@@ -60,6 +60,10 @@
 
             y = t.clientY;
             f = t.force;
+            if (f === 0) {
+                // Not all browsers report the force of the touch.
+                f = 1;
+            }
             if (!nodes[t.identifier]) {
                 oscillator = ac.createOscillator();
                 gainNode = ac.createGain();
