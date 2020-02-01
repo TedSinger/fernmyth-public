@@ -3,14 +3,15 @@
     <title>Share a Sensor!</title>
 </head>
 <body>
+    <button onclick='geoFindMe()'>Show my location</button><br/>
     <h1 id="map-link">your location goes here...</h1>
     <h2 id="status">unless something else goes here</h2>
 
     <script>
-        function startup() {
-            //var el = document.querySelector("body");
-            geoFindMe();
-        }
+        // function startup() {
+        //     //var el = document.querySelector("body");
+        //     geoFindMe();
+        // }
 
         function geoFindMe() {
             const status = document.querySelector('#status');
@@ -37,6 +38,6 @@
 
         }
 
-        document.addEventListener("DOMContentLoaded", startup);
+        // document.addEventListener("DOMContentLoaded", startup);
     </script>
 </body>
