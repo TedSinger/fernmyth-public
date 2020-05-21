@@ -3,7 +3,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <style>
         /* github.com/kognise/water.css */
-        body{font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;line-height:1.4;max-width:800px;margin:20px auto;padding:0 10px;color:#363636;background:#fff;text-rendering:optimizeLegibility}button,input,textarea{transition:background-color .1s linear,border-color .1s linear,color .1s linear,box-shadow .1s linear,transform .1s ease}h1{font-size:2.2em;margin-top:0}h1,h2,h3,h4,h5,h6{margin-bottom:12px}h1,h2,h3,h4,h5,h6,strong{color:#000}h1,h2,h3,h4,h5,h6,b,strong,th{font-weight:600}button,input[type='submit'],input[type='button'],input[type='checkbox']{cursor:pointer}input:not([type='checkbox']),select{display:block}input,select,button,textarea{color:#000;background-color:#efefef;font-family:inherit;font-size:inherit;margin-right:6px;margin-bottom:6px;padding:10px;border:none;border-radius:6px;outline:none}input:not([type='checkbox']),select,button,textarea{-webkit-appearance:none}textarea{margin-right:0;width:100%;box-sizing:border-box;resize:vertical}button,input[type='submit'],input[type='button']{padding-right:30px;padding-left:30px}button:hover,input[type='submit']:hover,input[type='button']:hover{background:#ddd}input:focus,select:focus,button:focus,textarea:focus{box-shadow:0 0 0 2px rgba(0,150,191,0.670588)}input[type='checkbox']:active,input[type='submit']:active,input[type='button']:active,button:active{transform:translateY(2px)}input:disabled{cursor:not-allowed;opacity:.5}::placeholder{color:#949494}a{color:#0076d1}a:hover{color:#4056d1}code,kbd{background:#efefef;color:#000;padding:5px;border-radius:6px}pre>code{padding:10px;display:block;overflow-x:auto}img{max-width:100%}hr{border:none;border-top:1px solid #dbdbdb}table{border-collapse:collapse;margin-bottom:10px;width:100%}td,th{padding:6px}table,th,td{border:1px solid #dbdbdb}
+        body{font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;line-height:1.4;max-width:800px;margin:20px auto;padding:0 10px;color:#363636;background:#fff;text-rendering:optimizeLegibility}button,input,textarea{transition:background-color .1s linear,border-color .1s linear,color .1s linear,box-shadow .1s linear,transform .1s ease}h1{font-size:2.2em;margin-top:0}h1,h2,h3,h4,h5,h6{margin-bottom:12px}h1,h2,h3,h4,h5,h6,strong{color:#000}h1,h2,h3,h4,h5,h6,b,strong,th{font-weight:600}button,input[type='submit'],input[type='button'],input[type='checkbox']{cursor:pointer}input:not([type='checkbox']),select{display:block}input,select,button,textarea{color:#000;background-color:#efefef;font-family:inherit;font-size:inherit;margin-right:6px;margin-bottom:6px;padding:10px;border:none;border-radius:6px;outline:none}input:not([type='checkbox']),select,button,textarea{-webkit-appearance:none}textarea{margin-right:0;width:100%;box-sizing:border-box;resize:vertical}button,input[type='submit'],input[type='button']{padding-right:30px;padding-left:30px}button:hover,input[type='submit']:hover,input[type='button']:hover{background:#ddd}input:focus,select:focus,button:focus,textarea:focus{box-shadow:0 0 0 2px rgba(0,150,191,0.670588)}input[type='checkbox']:active,input[type='submit']:active,input[type='button']:active,button:active{transform:translateY(2px)}input:disabled{cursor:not-allowed;opacity:.5}::placeholder{color:#949494}a{color:#0076d1}a:hover{color:#4056d1}code,kbd{background:#efefef;color:#000;padding:5px;border-radius:6px}pre>code{padding:10px;display:block;overflow-x:auto}img{max-width:100%}hr{border:none;border-top:1px solid #dbdbdb}table{border-collapse:collapse;margin-bottom:10px;width:100%}td,th{padding:6px}table,th,td{border:1px solid #dbdbdb}.item{border:1px solid #b0b0b0;border-radius: .5em; font-family: monospace;font-size: 1.6em;padding:3px;margin:3px;}
     </style>
 </head>
 <body>
@@ -15,28 +15,39 @@
     <p><li><a href="colors/">Basic Ergonomic Colors</a>
         <br> Needs to be redone with more lightness levels and more chroma levels. It's too hard to actually build a usable application with so few colors.
     </li></p><p>
-    <li><a href="piano/">A virtual musical keyboard</a><br>Geez, I need to really sit down and <em>learn</em> CSS one of these days</li></p>
+    <li><a href="piano/">A virtual musical keyboard (desktop only)</a><br>Geez, I need to really sit down and <em>learn</em> CSS one of these days</li></p>
     <li><a href="https://github.com/TedSinger/xvinyl">Directional window-switching for X</a></li>
     <li><a href="https://github.com/TedSinger/prompter">Terminal prompt motivated by a chaos of Networked Filesystems</a></li>
 </ul>
 
 <h3>Interests</h3>
-Human perception, attention, memory, learning, ergonomics, and workflow design.<br>
+Human perception, attention, memory, learning, ergonomics, and workflow design.<br><br>
 Any jumble of the following words:
-<table>
-    <tbody>
-        <tr><td>Dynamical</td><td>Stability</td><td>Control</td><td>Adaptive</td><td>System</td></tr>
-        <tr><td>Social</td><td>Evolutionary</td><td>Design</td><td>Feedback</td><td>Theory</td></tr>
-        <tr><td>Cultural</td><td>Cybernetics</td><td>Game</td><td>Robust</td><td>Regulatory</td></tr>
-    </tbody>
-</table>
+
+<div style="display: flex;flex-wrap: wrap;">
+    <div class="item">Dynamical</div>
+    <div class="item">Stability</div>
+    <div class="item">Control</div>
+    <div class="item">Adaptive</div>
+    <div class="item">System</div>
+    <div class="item">Social</div>
+    <div class="item">Evolutionary</div>
+    <div class="item">Design</div>
+    <div class="item">Feedback</div>
+    <div class="item">Theory</div>
+    <div class="item">Cultural</div>
+    <div class="item">Cybernetics</div>
+    <div class="item">Game</div>
+    <div class="item">Robust</div>
+    <div class="item">Regulatory</div>
+</div>
 
 <h3>Tech Stack Biases</h3>
 <ul>
     <li>SQLite is <em>wonderful</em></li>
     <li>I am comfortable and effective with Python, Numpy, Pandas, and VSCode.</li>
-    <li>I am curious and optimistic - with positive experiences so far - about xarray, DigitalOcean, S3, Go, Echo (Go web framework), Caddy, 0mq, Redux.js, and Mithril.js.</li>
-    <li>I am curious about Elixir, Postgres, and TileDB.</li>
+    <li>I am curious and optimistic - with positive experiences so far - about xarray, MiniZinc, DigitalOcean, S3, Go, Echo (Go web framework), Caddy, 0mq, Redux.js, and Mithril.js.</li>
+    <li>I am curious about Elixir (especially Phoenix LiveView), Postgres, and TileDB.</li>
     <li>I am curious about Clojure/Script, but every time I try it, I get stuck somewhere between a stack trace and an editor plugin.</li>
     <li>I am wary about Java and Scala. I'm sure they're fine <em>if you manage the complexity of the build and tooling</em>.</li>
     <li>I am bewildered by Javascript. I try to write as little as possible.</li>
